@@ -1,24 +1,39 @@
 import numpy as np
 import os
 import glob
+from cv2 import cv2
 
 
 
-pngFiles = []
+#for each subject, for each expression, get all images
 
-pathLittleBear = '/media/Data/CK+/CK+/cohn-kanade-images/S005'
 
-pathLocal = r'c:\Images\New Folder'
 
-for root, dirs, files in os.walk(pathLittleBear):
-    x=0
-    for directory in dirs:
-        if x == 2: 
-            break
-        x += 1
-        for file in files:
-            if file.endswith('.png'):
-                pngFiles.append(os.path.join(root, file))
+pathLittleBear = '/media/Data/CK+/CK+/cohn-kanade-images'
 
-print(pngFiles)
+pathLocal = r'c:\Images'
 
+allData = {}
+
+for subject in os.listdir(pathLocal):
+    subjectPath = os.path.join(pathLocal,subject)
+    if os.path.isdir(subjectPath):
+        subjectData = {}
+        for sequence in os.listdir(subjectPath):
+            sequencePath = os.path.join(subjectPath,sequence)
+            if os.path.isdir(sequencePath):
+                pngPaths = []
+                for sequenceFile in os.listdir(sequencePath):
+                    if sequenceFile.endswith('.png'):
+                        pngPaths.append(os.path.join(sequencePath, sequenceFile))
+                pngPaths.sort()
+                #create numpy array of the actual images here, use open cv
+
+                subjectData[sequence] = pngPaths
+                #todo 
+                #subjectData[sequence] = pngData(this represents the actual numpy array)
+        allData[subject] = subjectData
+
+print(allData)
+
+        
