@@ -31,6 +31,9 @@ def run_detection(image_path: str, recognition_model: str, face_client: FaceClie
     face_data = face_client.face.detect_with_stream(image, True, True, ALL_FACE_ATTRS, recognition_model=recognition_model, raw=True).response.json()
     image.close()
     time.sleep(4)  # Sleep for just over 1/20th of a minute to avoid having to pay
+
+    # Store the file path of the face
+    face_data[0]["localFacePath"] = image_path
     return face_data[0]
 
 
@@ -40,7 +43,8 @@ def main():
     creds = CognitiveServicesCredentials(args.key)
     client = FaceClient(args.endpoint, creds)
     faces = []
-    for image in images:
+    for i, image in enumerate(images):
+        print(f"{i + 1}/{len(images)}")
         face = run_detection(image, args.recognition_model, client)
         faces.append(face)
     with open(args.output, "w") as f:
