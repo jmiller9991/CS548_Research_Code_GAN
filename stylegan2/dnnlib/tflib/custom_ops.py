@@ -68,6 +68,8 @@ def _prepare_nvcc_cli(opts):
     cmd += ' --include-path "%s"' % os.path.join(tf.sysconfig.get_include(), 'external', 'com_google_absl')
     cmd += ' --include-path "%s"' % os.path.join(tf.sysconfig.get_include(), 'external', 'eigen_archive')
 
+    cmd += ' -std=c++11'
+
     compiler_bindir = _find_compiler_bindir()
     if compiler_bindir is None:
         # Require that _find_compiler_bindir succeeds on Windows.  Allow
@@ -124,7 +126,7 @@ def get_plugin(cuda_file):
             compile_opts += '"%s"' % os.path.join(tf.sysconfig.get_lib(), 'python', '_pywrap_tensorflow_internal.lib')
         elif os.name == 'posix':
             compile_opts += '"%s"' % os.path.join(tf.sysconfig.get_lib(), 'python', '_pywrap_tensorflow_internal.so')
-            compile_opts += ' --compiler-options \'-fPIC -D_GLIBCXX_USE_CXX11_ABI=1 -std=c++11\''
+            compile_opts += ' --compiler-options \'-fPIC -D_GLIBCXX_USE_CXX11_ABI=1\''
         else:
             assert False # not Windows or Linux, w00t?
         compile_opts += ' --gpu-architecture=%s' % _get_cuda_gpu_arch_string()
