@@ -8,8 +8,8 @@
 
 import numpy as np
 import tensorflow as tf
-import dnnlib
-import dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+import stylegan2.dnnlib.tflib as tflib
 
 # NOTE: Do not import any application-specific modules here!
 # Specify all network parameters as kwargs.

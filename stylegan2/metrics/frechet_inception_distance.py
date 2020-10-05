@@ -10,10 +10,10 @@ import os
 import numpy as np
 import scipy
 import tensorflow as tf
-import dnnlib.tflib as tflib
+import stylegan2.dnnlib.tflib as tflib
 
-from metrics import metric_base
-from training import misc
+from stylegan2.metrics import metric_base
+from stylegan2.training import misc
 
 #----------------------------------------------------------------------------
 

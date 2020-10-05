@@ -9,10 +9,10 @@ import copy
 import os
 import sys
 
-import dnnlib
-from dnnlib import EasyDict
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import EasyDict
 
-from metrics.metric_defaults import metric_defaults
+from stylegan2.metrics.metric_defaults import metric_defaults
 
 #----------------------------------------------------------------------------
 

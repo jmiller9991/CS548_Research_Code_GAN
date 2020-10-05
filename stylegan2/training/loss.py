@@ -8,8 +8,8 @@
 
 import numpy as np
 import tensorflow as tf
-import dnnlib.tflib as tflib
-from dnnlib.tflib.autosummary import autosummary
+from stylegan2.dnnlib import tflib as tflib
+from stylegan2.dnnlib.tflib.autosummary import autosummary
 
 #----------------------------------------------------------------------------
 # Logistic loss from the paper

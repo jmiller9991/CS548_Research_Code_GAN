@@ -11,7 +11,7 @@ import pickle
 import numpy as np
 import PIL.Image
 import PIL.ImageFont
-import dnnlib
+from stylegan2 import dnnlib
 
 #----------------------------------------------------------------------------
 # Convenience wrappers for pickle that are able to load data produced by

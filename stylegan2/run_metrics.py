@@ -8,12 +8,12 @@ import argparse
 import os
 import sys
 
-import dnnlib
-import dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib as tflib
 
-import pretrained_networks
-from metrics import metric_base
-from metrics.metric_defaults import metric_defaults
+from stylegan2 import pretrained_networks
+from stylegan2.metrics import metric_base
+from stylegan2.metrics.metric_defaults import metric_defaults
 
 #----------------------------------------------------------------------------
 

@@ -17,9 +17,9 @@ import traceback
 import numpy as np
 import tensorflow as tf
 import PIL.Image
-import dnnlib.tflib as tflib
+from stylegan2.dnnlib import tflib as tflib
 
-from training import dataset
+from stylegan2.training import dataset
 
 #----------------------------------------------------------------------------
 

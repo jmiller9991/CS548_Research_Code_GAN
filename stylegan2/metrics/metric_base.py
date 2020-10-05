@@ -11,11 +11,11 @@ import time
 import hashlib
 import numpy as np
 import tensorflow as tf
-import dnnlib
-import dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib as tflib
 
-from training import misc
-from training import dataset
+from stylegan2.training import misc
+from stylegan2.training import dataset
 
 #----------------------------------------------------------------------------
 # Base class for metrics.

@@ -7,8 +7,8 @@
 import argparse
 import numpy as np
 import PIL.Image
-import dnnlib
-import dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib as tflib
 import re
 import sys
 

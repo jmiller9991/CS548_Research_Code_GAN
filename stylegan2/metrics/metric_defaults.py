@@ -6,7 +6,7 @@
 
 """Default metric definitions."""
 
-from dnnlib import EasyDict
+from stylegan2.dnnlib import EasyDict
 
 #----------------------------------------------------------------------------
 
