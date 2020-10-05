@@ -5,7 +5,7 @@ from cv2 import cv2
 
 pathLittleBear = '/media/Data/CK+/CK+/cohn-kanade-images'
 
-pathLocal = r'c:\Images'
+pathLocal = r'c:\CK+'
 
 allData = {}
 
