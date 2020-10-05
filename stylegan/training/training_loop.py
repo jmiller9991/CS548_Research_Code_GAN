@@ -10,15 +10,15 @@
 import os
 import numpy as np
 import tensorflow as tf
-import dnnlib
-import dnnlib.tflib as tflib
-from dnnlib.tflib.autosummary import autosummary
+from stylegan import dnnlib
+import stylegan.dnnlib.tflib as tflib
+from stylegan.dnnlib.tflib.autosummary import autosummary
 
-import config
-import train
-from training import dataset
-from training import misc
-from metrics import metric_base
+from stylegan import config
+from stylegan import train
+from stylegan.training import dataset
+from stylegan.training import misc
+from stylegan.metrics import metric_base
 
 #----------------------------------------------------------------------------
 # Just-in-time processing of training images before feeding them to the networks.

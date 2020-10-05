@@ -11,9 +11,9 @@ import os
 import pickle
 import numpy as np
 import PIL.Image
-import dnnlib
-import dnnlib.tflib as tflib
-import config
+from stylegan import dnnlib
+import stylegan.dnnlib.tflib as tflib
+from stylegan import config
 
 def main():
     # Initialize TensorFlow.

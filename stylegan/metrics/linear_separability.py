@@ -11,10 +11,10 @@ from collections import defaultdict
 import numpy as np
 import sklearn.svm
 import tensorflow as tf
-import dnnlib.tflib as tflib
+import stylegan.dnnlib.tflib as tflib
 
-from metrics import metric_base
-from training import misc
+from stylegan.metrics import metric_base
+from stylegan.training import misc
 
 #----------------------------------------------------------------------------
 

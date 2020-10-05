@@ -4,11 +4,11 @@ import pickle
 from tqdm import tqdm
 import PIL.Image
 import numpy as np
-import dnnlib
-import dnnlib.tflib as tflib
-import config
-from encoder.generator_model import Generator
-from encoder.perceptual_model import PerceptualModel
+from stylegan import dnnlib
+import stylegan.dnnlib.tflib as tflib
+from stylegan import config
+from stylegan.encoder.generator_model import Generator
+from stylegan.encoder.perceptual_model import PerceptualModel
 
 URL_FFHQ = 'https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ'  # karras2019stylegan-ffhq-1024x1024.pkl
 

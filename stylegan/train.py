@@ -8,11 +8,11 @@
 """Main entry point for training StyleGAN and ProGAN networks."""
 
 import copy
-import dnnlib
-from dnnlib import EasyDict
+import stylegan.dnnlib
+from stylegan.dnnlib import EasyDict
 
-import config
-from metrics import metric_base
+from stylegan import config
+from stylegan.metrics import metric_base
 
 #----------------------------------------------------------------------------
 # Official training configs for StyleGAN, targeted mainly for FFHQ.
