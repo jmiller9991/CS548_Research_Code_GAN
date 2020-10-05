@@ -3,12 +3,6 @@ import os
 import glob
 from cv2 import cv2
 
-
-
-#for each subject, for each expression, get all images
-
-
-
 pathLittleBear = '/media/Data/CK+/CK+/cohn-kanade-images'
 
 pathLocal = r'c:\Images'
@@ -22,16 +16,25 @@ for subject in os.listdir(pathLocal):
         for sequence in os.listdir(subjectPath):
             sequencePath = os.path.join(subjectPath,sequence)
             if os.path.isdir(sequencePath):
-                pngPaths = []
+                imagePaths = []
                 for sequenceFile in os.listdir(sequencePath):
                     if sequenceFile.endswith('.png'):
-                        pngPaths.append(os.path.join(sequencePath, sequenceFile))
-                pngPaths.sort()
-                #create numpy array of the actual images here, use open cv
+                        path = os.path.join(sequencePath, sequenceFile)
+                        imagePaths.append(path)
+                imagePaths.sort()
+                images = []
 
-                subjectData[sequence] = pngPaths
-                #todo 
-                #subjectData[sequence] = pngData(this represents the actual numpy array)
+                for path in imagePaths:
+                    image = cv2.imread(path)
+                    images.append(image)
+
+                #create numpy array of images
+                sequenceImages = np.zeros(len(images))
+                sequenceImages = images
+                #todo put the images in a numpy stack
+                #todo define shape of matrix
+
+                subjectData[sequence] = sequenceImages
         allData[subject] = subjectData
 
 print(allData)
