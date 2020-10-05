@@ -32,7 +32,7 @@ def project_image(proj, targets, png_prefix, num_snapshots):
 #----------------------------------------------------------------------------
 
 def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
-    print('Loading networks from "%s"...' % network_pkl)
+    print('GENERATED: Loading networks from "%s"...' % network_pkl)
     _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
     proj = projector.Projector()
     proj.set_network(Gs)
@@ -43,7 +43,7 @@ def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
     Gs_kwargs.truncation_psi = truncation_psi
 
     for seed_idx, seed in enumerate(seeds):
-        print('Projecting seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
+        print('GENERATED: Projecting seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
         rnd = np.random.RandomState(seed)
         z = rnd.randn(1, *Gs.input_shape[1:])
         tflib.set_vars({var: rnd.randn(*var.shape.as_list()) for var in noise_vars})
@@ -53,17 +53,17 @@ def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
 #----------------------------------------------------------------------------
 
 def project_real_images(network_pkl, dataset_name, data_dir, num_images, num_snapshots):
-    print('Loading networks from "%s"...' % network_pkl)
+    print('REAL: Loading networks from "%s"...' % network_pkl)
     _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
     proj = projector.Projector()
     proj.set_network(Gs)
 
-    print('Loading images from "%s"...' % dataset_name)
+    print('REAL: Loading images from "%s"...' % dataset_name)
     dataset_obj = dataset.load_dataset(data_dir=data_dir, tfrecord_dir=dataset_name, max_label_size=0, repeat=False, shuffle_mb=0)
     assert dataset_obj.shape == Gs.output_shape[1:]
 
     for image_idx in range(num_images):
-        print('Projecting image %d/%d ...' % (image_idx, num_images))
+        print('REAL: Projecting image %d/%d ...' % (image_idx, num_images))
         images, _labels = dataset_obj.get_minibatch_np(1)
         images = misc.adjust_dynamic_range(images, [0, 255], [-1, 1])
         project_image(proj, targets=images, png_prefix=dnnlib.make_run_dir_path('image%04d-' % image_idx), num_snapshots=num_snapshots)
