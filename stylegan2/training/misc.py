@@ -67,7 +67,7 @@ def convert_to_pil_image(image, drange=[0,1]):
 
     image = adjust_dynamic_range(image, drange, [0,255])
     image = np.rint(image).clip(0, 255).astype(np.uint8)
-    np.print(image)
+    print(image)
     fmt = 'RGB' if image.ndim == 3 else 'L'
     return PIL.Image.fromarray(image, fmt)
 
