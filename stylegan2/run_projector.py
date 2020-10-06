@@ -53,7 +53,7 @@ def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
     Gs_kwargs = dnnlib.EasyDict()
     print('Gs_kwargs received')
     Gs_kwargs.randomize_noise = False
-    print('Gs_kwargs noise randomization is ' + Gs_kwargs.randomize_noise)
+    print('Gs_kwargs noise randomization is ' + str(Gs_kwargs.randomize_noise))
     Gs_kwargs.truncation_psi = truncation_psi
     print('Gs_kwargs.truncation_pis set')
 
@@ -68,7 +68,7 @@ def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
         images = Gs.run(z, None, **Gs_kwargs)
         print('Running Gs on images')
         project_image(proj, targets=images, png_prefix=dnnlib.make_run_dir_path('seed%04d-' % seed), num_snapshots=num_snapshots)
-        print('Projected image from ' + seed_idx)
+        print('Projected image from ' + str(seed_idx))
 
 #----------------------------------------------------------------------------
 
@@ -90,11 +90,11 @@ def project_real_images(network_pkl, dataset_name, data_dir, num_images, num_sna
     for image_idx in range(num_images):
         print('REAL: Projecting image %d/%d ...' % (image_idx, num_images))
         images, _labels = dataset_obj.get_minibatch_np(1)
-        print('Obtained image and label from dataset' + image_idx)
+        print('Obtained image and label from dataset' + str(image_idx))
         images = misc.adjust_dynamic_range(images, [0, 255], [-1, 1])
         print('Adjusted Dynamic Ranges')
         project_image(proj, targets=images, png_prefix=dnnlib.make_run_dir_path('image%04d-' % image_idx), num_snapshots=num_snapshots)
-        print('image ' + image_idx + ' projected')
+        print('image ' + str(image_idx) + ' projected')
 
 #----------------------------------------------------------------------------
 
