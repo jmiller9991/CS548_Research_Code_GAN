@@ -47,7 +47,7 @@ def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
     proj.set_network(Gs)
     print('Projector Network Set')
     noise_vars = [var for name, var in Gs.components.synthesis.vars.items() if name.startswith('noise')]
-    np.print(noise_vars)
+    print(noise_vars)
 
     print('Getting Generator S arguments')
     Gs_kwargs = dnnlib.EasyDict()
