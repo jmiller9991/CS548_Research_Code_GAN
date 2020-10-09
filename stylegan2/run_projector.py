@@ -32,12 +32,14 @@ def project_image(proj, targets, png_prefix, num_snapshots):
         print('Step done')
         if proj.get_cur_step() in snapshot_steps:
             print('Cond Reached')
+            sub_dalatents = proj.get_dlatents()
+            np.save(proj.get_images(), png_prefix + 'step%04d.png' % proj.get_cur_step(), sub_dalatents)
             misc.save_image_grid(proj.get_images(), png_prefix + 'step%04d.png' % proj.get_cur_step(), drange=[-1,1])
             print('Saved Step Image')
         dalatents = proj.get_dlatents()
-        #TODO Save as npy file in run_projector and the dalatents np array
         print(type(dalatents))
         print(dalatents.shape)
+        np.save("final_dlatent", dalatents)
 
     print('\r%-30s\r' % '', end='', flush=True)
 
