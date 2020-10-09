@@ -16,7 +16,7 @@ import pretrained_networks
 
 #----------------------------------------------------------------------------
 
-#Run a projector on the generator to get the latent space of recently generated image
+#TODO Run a projector on the generator to get the latent space of recently generated image
 
 def generate_images(network_pkl, seeds, truncation_psi):
     print('Loading networks from "%s"...' % network_pkl)
