@@ -35,7 +35,7 @@ def project_image(proj, targets, png_prefix, num_snapshots):
             misc.save_image_grid(proj.get_images(), png_prefix + 'step%04d.png' % proj.get_cur_step(), drange=[-1,1])
             print('Saved Step Image')
         dalatents = proj.get_dlatents()
-        #print(dalatents)
+        #Save as npy file in run_projector and the dalatents np array
         print(type(dalatents))
         print(dalatents.shape)
 
