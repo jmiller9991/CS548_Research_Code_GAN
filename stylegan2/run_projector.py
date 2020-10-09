@@ -39,7 +39,7 @@ def project_image(proj, targets, png_prefix, num_snapshots):
         dalatents = proj.get_dlatents()
         print(type(dalatents))
         print(dalatents.shape)
-        np.save("final_dlatent", dalatents)
+        np.save(png_prefix + "final_dlatent", dalatents)
 
     print('\r%-30s\r' % '', end='', flush=True)
 
