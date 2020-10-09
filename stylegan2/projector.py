@@ -8,10 +8,13 @@ import numpy as np
 import tensorflow as tf
 from stylegan2 import dnnlib
 from stylegan2.dnnlib import tflib as tflib
+from stylegan2.training import misc
+
 
 from stylegan2 import pretrained_networks
 
 #----------------------------------------------------------------------------
+
 
 class Projector:
     def __init__(self):
