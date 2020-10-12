@@ -24,13 +24,16 @@ for subject in os.listdir(pathLocal):
                 imagePaths.sort()
                 images = []
 
+                #determine if the images in ck are the same size for numpy stack
                 for path in imagePaths:
                     image = cv2.imread(path)
+                    height, width, channels = image.shape
                     images.append(image)
 
                 #create numpy array of images
                 sequenceImages = np.zeros(len(images))
                 sequenceImages = images
+                # np.stack(sequenceImages)
                 #todo put the images in a numpy stack
                 #todo define shape of matrix
 
