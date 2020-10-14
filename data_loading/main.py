@@ -3,19 +3,18 @@ import os
 import glob
 from cv2 import cv2
 
-pathLittleBear = '/media/Data/CK+/CK+/cohn-kanade-images'
+imagesPath = '/media/Data/CK+/CK+/cohn-kanade-images'
 
-pathLocal = r'c:\CK+'
+allImageData = {}
 
-allData = {}
-
-for subject in os.listdir(pathLocal):
-    subjectPath = os.path.join(pathLocal,subject)
+for subject in os.listdir(imagesPath):
+    subjectPath = os.path.join(imagesPath,subject)
     if os.path.isdir(subjectPath):
         subjectData = {}
         for sequence in os.listdir(subjectPath):
             sequencePath = os.path.join(subjectPath,sequence)
             if os.path.isdir(sequencePath):
+                print(sequencePath)
                 imagePaths = []
                 for sequenceFile in os.listdir(sequencePath):
                     if sequenceFile.endswith('.png'):
@@ -24,22 +23,40 @@ for subject in os.listdir(pathLocal):
                 imagePaths.sort()
                 images = []
 
-                #determine if the images in ck are the same size for numpy stack
                 for path in imagePaths:
                     image = cv2.imread(path)
                     height, width, channels = image.shape
                     images.append(image)
 
-                #create numpy array of images
-                sequenceImages = np.zeros(len(images))
-                sequenceImages = images
-                # np.stack(sequenceImages)
-                #todo put the images in a numpy stack
-                #todo define shape of matrix
+                sequenceImages = np.stack(images)
+                #print(sequenceImages.shape)
 
                 subjectData[sequence] = sequenceImages
-        allData[subject] = subjectData
+        allImageData[subject] = subjectData
 
-print(allData)
 
-        
+emotionsPath = '/media/Data/CK+/CK+/Emotion'
+allEmotionData = {}
+
+for subject in os.listdir(emotionsPath):
+    subjectPath = os.path.join(emotionsPath,subject)
+    if os.path.isdir(subjectPath):
+        subjectData = {}
+        for sequence in os.listdir(subjectPath):
+            sequencePath = os.path.join(subjectPath,sequence)
+            if os.path.isdir(sequencePath):
+                emotionLabels = []
+                for sequenceFile in os.listdir(sequencePath):
+                    path = os.path.join(sequencePath, sequenceFile)
+                    emotionFile = open(path, "r")
+                    emotionLabel = emotionFile.read()
+                    if(emotionLabel != ""):
+                        print(sequencePath)
+                        print(emotionLabel)
+                        emotionLabels.append(emotionLabel)
+                subjectData[sequence] = emotionLabels
+        allEmotionData[subject] = subjectData
+
+print(allImageData["S005"]["001"])
+print(allEmotionData["S005"]["001"])
+
