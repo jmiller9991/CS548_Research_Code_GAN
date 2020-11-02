@@ -7,6 +7,7 @@ class SequenceData:
     frames = []
     emotionLabel = ""
     facsLabels = ""
+    #todo needs to become a numpy array
     landmarks = []
 
     def __init__(self):
@@ -20,14 +21,9 @@ emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
-CKData = {}
-
-imageData = {}
-emotionData = {}
-facsData = {}
 
 #TODO other methods rely on image data to load subjects, pull that out into its own method probably
-def getImageData():
+def getImageData(CKData):
     for subject in os.listdir(imagesPath):
         subjectPath = os.path.join(imagesPath,subject)
         if os.path.isdir(subjectPath):
@@ -55,7 +51,7 @@ def getImageData():
                     subjectSequences[sequence] = sequenceData
             CKData[subject] = subjectSequences
 
-def getEmotionData():
+def getEmotionData(CKData):
     for subject in os.listdir(emotionsPath):
         subjectPath = os.path.join(emotionsPath,subject)
         if os.path.isdir(subjectPath):
@@ -73,7 +69,7 @@ def getEmotionData():
                             emotionLabels.append(emotionLabel)
                     CKData[subject][sequence].emotionLabel = emotionLabel
 
-def getFacsData():
+def getFacsData(CKData):
     for subject in os.listdir(facsPath):
         subjectPath = os.path.join(facsPath,subject)
         if os.path.isdir(subjectPath):
@@ -91,8 +87,24 @@ def getFacsData():
                             facsLabels.append(facsLabel)
                     CKData[subject][sequence].facsLabels = facsLabels
 
-#TODO preallocate for landmarks, constant length
-def getLandmarksData():
+
+def readLandmarks(path):
+    #todo fix this shape later
+    landmarks = np.zeros(136)
+    with open(path, "r") as landmarksFile:
+        index = 0
+        for line in landmarksFile:
+            for point in line.split():
+                if(point != "" and index < 136):
+                    landmarks[index] = point
+                    if(index == 0):
+                        print(path)
+                        print(point)
+                        print(landmarks[index])
+                    index += 1
+
+
+def getLandmarksData(CKData):
     for subject in os.listdir(landmarksPath):
         subjectPath = os.path.join(landmarksPath,subject)
         if os.path.isdir(subjectPath):
@@ -100,23 +112,25 @@ def getLandmarksData():
                 sequencePath = os.path.join(subjectPath,sequence)
                 if os.path.isdir(sequencePath):
                     # print(sequencePath)
-                    landmarks = []
-                    for sequenceFile in os.listdir(sequencePath):
+                    for sequenceFile in sorted(os.listdir(sequencePath)):
                         if sequenceFile.endswith('.txt'):
                             path = os.path.join(sequencePath, sequenceFile)
-                            landmarksFile = open(path, "r")
-                            landmark = landmarksFile.readlines()
-                            if(landmark != ""):
-                                print(path)
-                                print(landmark)
-                                landmarks.append(landmark)
-                    CKData[subject][sequence].landmarks.append(landmarks)
+                            landmarks = readLandmarks(path)
+                            CKData[subject][sequence].landmarks.append(landmarks)
+                    CKData[subject][sequence].landmarks = np.array(CKData[subject][sequence].landmarks)
 
-                    
 
-getImageData()
-# getEmotionData()
-# getFacsData()
-getLandmarksData()
+def main():
 
-print(CKData["S005"]["001"].landmarks[0])
+    CKData = {}
+    getImageData(CKData)
+    # getEmotionData(CKData)
+    # getFacsData(CKData)
+    getLandmarksData(CKData)
+
+    print(CKData["S005"]["001"].landmarks[0])
+
+if __name__ == "__main__":
+    main()
+
+
