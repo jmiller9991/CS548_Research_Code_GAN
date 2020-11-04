@@ -113,7 +113,7 @@ def _parse_num_range(s):
     if m:
         return list(range(int(m.group(1)), int(m.group(2))+1))
     vals = s.split(',')
-    return [int(x) for x in vals]
+    return [int(x) for x in vals if x]
 
 #----------------------------------------------------------------------------
 
@@ -163,7 +163,7 @@ Run 'python %(prog)s <subcommand> --help' for subcommand help.''',
 
     kwargs = vars(args)
     sc = dnnlib.SubmitConfig()
-    sc.num_gpus = 1
+    sc.num_gpus = 2
     sc.submit_target = dnnlib.SubmitTarget.LOCAL
     sc.local.do_not_copy_source_files = True
     sc.run_dir_root = kwargs.pop('result_dir')
