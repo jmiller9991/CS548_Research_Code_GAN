@@ -10,7 +10,7 @@ n = 230400
 
 
 def imageManip(image):
-    getTrupleList()
+    print("Code")
 
 
 def buildEmotionModel(inputShape, classCnt):
