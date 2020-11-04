@@ -7,7 +7,7 @@ class SequenceData:
     frames = []
     emotionLabel = ""
     facsLabels = ""
-    #todo needs to become a numpy array
+    #vector containing
     landmarks = []
 
     def __init__(self):
@@ -89,19 +89,19 @@ def getFacsData(CKData):
 
 
 def readLandmarks(path):
-    #todo fix this shape later
-    landmarks = np.zeros(136)
+    landmarks = np.zeros(shape=(68,2))
     with open(path, "r") as landmarksFile:
-        index = 0
+        i = 0
         for line in landmarksFile:
+            j = 0
             for point in line.split():
-                if(point != "" and index < 136):
-                    landmarks[index] = point
-                    if(index == 0):
-                        print(path)
-                        print(point)
-                        print(landmarks[index])
-                    index += 1
+                if(point != ""):
+                    print(path)
+                    print(point)
+                    landmarks[i][j] = point
+                    j+=1
+            i+=1
+    return landmarks
 
 
 def getLandmarksData(CKData):
@@ -121,14 +121,13 @@ def getLandmarksData(CKData):
 
 
 def main():
-
     CKData = {}
     getImageData(CKData)
-    # getEmotionData(CKData)
-    # getFacsData(CKData)
+    getEmotionData(CKData)
+    getFacsData(CKData)
     getLandmarksData(CKData)
 
-    print(CKData["S005"]["001"].landmarks[0])
+    print(CKData["S005"]["001"].landmarks[0][0])
 
 if __name__ == "__main__":
     main()
