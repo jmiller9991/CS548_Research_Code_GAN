@@ -13,6 +13,7 @@ import uuid
 import hashlib
 import tempfile
 import shutil
+import sys
 import tensorflow as tf
 from tensorflow.python.client import device_lib # pylint: disable=no-name-in-module
 
@@ -67,6 +68,7 @@ def _prepare_nvcc_cli(opts):
     cmd += ' --include-path "%s"' % os.path.join(tf.sysconfig.get_include(), 'external', 'protobuf_archive', 'src')
     cmd += ' --include-path "%s"' % os.path.join(tf.sysconfig.get_include(), 'external', 'com_google_absl')
     cmd += ' --include-path "%s"' % os.path.join(tf.sysconfig.get_include(), 'external', 'eigen_archive')
+    cmd += ' --include-path "/usr/include"'
 
     cmd += ' -std=c++11'
 
