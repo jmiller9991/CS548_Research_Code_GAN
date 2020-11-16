@@ -21,7 +21,6 @@ imagesPath = ckPath + 'cohn-kanade-images'
 emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
-CKDataComplete = {}
 
 
 #TODO other methods rely on image data to load subjects, pull that out into its own method probably
@@ -131,7 +130,6 @@ def main():
 
     print(CKData["S005"]["001"].landmarks[0][0])
     global CKDataComplete
-    CKDataComplete = CKData
 
 if __name__ == "__main__":
     main()

@@ -44,6 +44,15 @@ def project_image(proj, targets, png_prefix, num_snapshots):
     print('\r%-30s\r' % '', end='', flush=True)
 
 #----------------------------------------------------------------------------
+def project_image_nosave(targets, proj = projector.Projector()):
+    proj.start(targets)
+    while proj.get_cur_step() < proj.num_steps:
+        proj.step()
+    dalatents = proj.get_dlatents()
+
+    return dalatents
+
+#----------------------------------------------------------------------------
 
 def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):
     print('GENERATED: Loading networks from "%s"...' % network_pkl)
