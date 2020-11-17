@@ -41,7 +41,7 @@ def buildConvEmotionModel(inputShape, classCnt):
 
     model.add(Conv2D(10, 6, activation='relu', input_shape=inputShape))
     model.add(Conv2D(5, 6, activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(3, 3, activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(2, 3, activation='relu'))
