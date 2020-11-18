@@ -406,3 +406,11 @@ def load_ground(dataDir,
     else:
         return all3DFilenames, allImageFilenames, allLabels, allSubjects, allTasks
 
+
+def main():
+    print("HELLO")
+
+
+if __name__ == "__main__":
+    main()
+
