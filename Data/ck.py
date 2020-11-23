@@ -18,6 +18,133 @@ emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
+
+
+def getEmotionData():
+    emotionData = []
+    for subject in sorted(os.listdir(emotionsPath)):
+        subjectPath = os.path.join(emotionsPath,subject)
+        if os.path.isdir(subjectPath):
+            for sequence in sorted(os.listdir(subjectPath)):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    emotionLabels = []
+                    for sequenceFile in sorted(os.listdir(sequencePath)):
+                        path = os.path.join(sequencePath, sequenceFile)
+                        emotionFile = open(path, "r")
+                        emotionLabel = emotionFile.read()
+                        if(emotionLabel != ""):
+                            emotionLabels.append(emotionLabel)
+                    emotionData.append(emotionLabel)
+    return np.array(emotionData)
+
+
+
+
+
+def getLastFrameFacsDataWithoutIntensity():
+    allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    presentActionUnits = []
+    facsLabels = []
+    for subject in sorted(os.listdir(facsPath)):
+        subjectPath = os.path.join(facsPath,subject)
+        if os.path.isdir(subjectPath):
+            for sequence in sorted(os.listdir(subjectPath)):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    allFacsLabels = []
+                    facsFilePaths = []
+                    for facsFile in sorted(os.listdir(sequencePath)):
+                        path = os.path.join(sequencePath, facsFile)
+                        facsFilePaths.append(path)
+                    sequenceFacsLabels = np.zeros(shape=30)
+                    facsFile = open(facsFilePaths[-1], "r")
+                    index = 0
+                    for line in facsFile:
+                        for i, sequenceActionUnit in enumerate(line.split()):
+                            sequenceActionUnitInt = float(sequenceActionUnit)
+                            j = 0
+                            for au in allActionUnits:
+                                #skip the intensity
+                                if i == 0:
+                                    if sequenceActionUnitInt == au:
+                                        sequenceFacsLabels[j] = 1
+                                        presentActionUnits.append(au)
+                                j+=1
+                        # print(facsFile)
+                        # print(sequenceFacsLabels)
+                        allFacsLabels.append(sequenceFacsLabels)
+                    facsLabels.append(allFacsLabels)
+    return np.array(facsLabels, dtype=object)
+
+def readLandmarks(path):
+    landmarks = np.zeros(shape=(68,2))
+    with open(path, "r") as landmarksFile:
+        i = 0
+        for line in landmarksFile:
+            j = 0
+            for point in line.split():
+                if(point != ""):
+                    #print(path)
+                    #print(point)
+                    landmarks[i][j] = point
+                    j+=1
+            i+=1
+    return landmarks
+
+
+
+def getLastFrames():
+    subjectSequenceImages = []
+    subjects = []
+    for subject in sorted(os.listdir(imagesPath)):
+        subjectPath = os.path.join(imagesPath,subject)
+        subjects.append(subject)
+        if os.path.isdir(subjectPath):
+            subjectFinalImages = []
+            for sequence in sorted(os.listdir(subjectPath)):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    # print(sequencePath)
+                    imagePaths = []
+                    for sequenceFile in sorted(os.listdir(sequencePath)):
+                        if sequenceFile.endswith('.png'):
+                            path = os.path.join(sequencePath, sequenceFile)
+                            imagePaths.append(path)
+                    lastImage = cv2.imread(imagePaths[-1])
+                    print(imagePaths[-1])
+                    subjectFinalImages.append(lastImage)
+            subjectSequenceImages.append(subjectFinalImages)
+    return np.array(subjects), np.array(subjectSequenceImages, dtype=object)
+
+#todo fix storage of emotion data?
+def getLastFrameData():
+    subjects, subjectSequenceImages = getLastFrames()
+    return subjects, subjectSequenceImages, getEmotionData(), getLastFrameFacsDataWithoutIntensity()
+
+def main():
+    subjects, lastFrameImages, emotionData, facs = getLastFrameData()
+    print(facs)
+
+if __name__ == "__main__":
+    main()
+
+#TODO
+# make sure intensity is stored somewhere
+
+# pull out separate presesnt AUs into their own array 
+
+# create getLastFrameData
+# images, ground, subjects = ck.getLastFrameData()
+# will be one numpy array. returns 3 numpy arrays: 
+# images: (samples, height, width, channels)
+
+# ground: (samples, numClasses)
+
+# subjects: (samples)
+
+
+
 #TODO other methods rely on image data to load subjects, pull that out into its own method probably
 # def getImageData(CKData):
 #     for subject in os.listdir(imagesPath):
@@ -45,24 +172,6 @@ landmarksPath = ckPath + 'Landmarks'
 #                     sequenceData.frames = sequenceFrames
 #                     subjectSequences[sequence] = sequenceData
 #             CKData[subject] = subjectSequences
-
-def getEmotionData():
-    emotionData = []
-    for subject in sorted(os.listdir(emotionsPath)):
-        subjectPath = os.path.join(emotionsPath,subject)
-        if os.path.isdir(subjectPath):
-            for sequence in sorted(os.listdir(subjectPath)):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    emotionLabels = []
-                    for sequenceFile in sorted(os.listdir(sequencePath)):
-                        path = os.path.join(sequencePath, sequenceFile)
-                        emotionFile = open(path, "r")
-                        emotionLabel = emotionFile.read()
-                        if(emotionLabel != ""):
-                            emotionLabels.append(emotionLabel)
-                    emotionData.append(emotionLabel)
-    return np.array(emotionData)
 
 # def getFacsData(CKData):
 #     for subject in os.listdir(facsPath):
@@ -116,56 +225,6 @@ def getEmotionData():
 #                     # CKData[subject][sequence].facsLabels = allFacsLabels
 #     return np.array(facsLabels)
 
-def getLastFrameFacsDataWithoutIntensity():
-    allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
-    presentActionUnits = []
-    facsLabels = []
-    for subject in sorted(os.listdir(facsPath)):
-        subjectPath = os.path.join(facsPath,subject)
-        if os.path.isdir(subjectPath):
-            for sequence in sorted(os.listdir(subjectPath)):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    allFacsLabels = []
-                    facsFilePaths = []
-                    for facsFile in sorted(os.listdir(sequencePath)):
-                        path = os.path.join(sequencePath, facsFile)
-                        facsFilePaths.append(path)
-                    sequenceFacsLabels = np.zeros(shape=30)
-                    facsFile = open(facsFilePaths[-1], "r")
-                    index = 0
-                    for line in facsFile:
-                        for i, sequenceActionUnit in enumerate(line.split()):
-                            sequenceActionUnitInt = float(sequenceActionUnit)
-                            j = 0
-                            for au in allActionUnits:
-                                #skip the intensity
-                                if i == 0:
-                                    if sequenceActionUnitInt == au:
-                                        sequenceFacsLabels[j] = 1
-                                        presentActionUnits.append(au)
-                                j+=1
-                        # print(facsFile)
-                        # print(sequenceFacsLabels)
-                        allFacsLabels.append(sequenceFacsLabels)
-                    facsLabels.append(allFacsLabels)
-    return np.array(facsLabels, dtype=object)
-
-def readLandmarks(path):
-    landmarks = np.zeros(shape=(68,2))
-    with open(path, "r") as landmarksFile:
-        i = 0
-        for line in landmarksFile:
-            j = 0
-            for point in line.split():
-                if(point != ""):
-                    #print(path)
-                    #print(point)
-                    landmarks[i][j] = point
-                    j+=1
-            i+=1
-    return landmarks
-
 # def getLandmarksData(CKData):
 #     for subject in os.listdir(landmarksPath):
 #         subjectPath = os.path.join(landmarksPath,subject)
@@ -180,54 +239,5 @@ def readLandmarks(path):
 #                             landmarks = readLandmarks(path)
 #                             CKData[subject][sequence].landmarks.append(landmarks)
 #                     CKData[subject][sequence].landmarks = np.array(CKData[subject][sequence].landmarks)
-
-def getLastFrames():
-    subjectSequenceImages = []
-    subjects = []
-    for subject in sorted(os.listdir(imagesPath)):
-        subjectPath = os.path.join(imagesPath,subject)
-        subjects.append(subject)
-        if os.path.isdir(subjectPath):
-            subjectFinalImages = []
-            for sequence in sorted(os.listdir(subjectPath)):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    # print(sequencePath)
-                    imagePaths = []
-                    for sequenceFile in sorted(os.listdir(sequencePath)):
-                        if sequenceFile.endswith('.png'):
-                            path = os.path.join(sequencePath, sequenceFile)
-                            imagePaths.append(path)
-                    lastImage = cv2.imread(imagePaths[-1])
-                    print(imagePaths[-1])
-                    subjectFinalImages.append(lastImage)
-            subjectSequenceImages.append(subjectFinalImages)
-    return np.array(subjects), np.array(subjectSequenceImages, dtype=object)
-
-#todo fix storage of emotion data?
-def getLastFrameData():
-    subjects, subjectSequenceImages = getLastFrames()
-    return subjects, subjectSequenceImages, getEmotionData(), getLastFrameFacsDataWithoutIntensity()
-
-def main():
-    subjects, lastFrameImages, emotionData, facs = getLastFrameData()
-    print(facs)
-
-if __name__ == "__main__":
-    main()
-
-#TODO
-# make sure intensity is stored somewhere
-
-# pull out separate presesnt AUs into their own array 
-
-# create getLastFrameData
-# images, ground, subjects = ck.getLastFrameData()
-# will be one numpy array. returns 3 numpy arrays: 
-# images: (samples, height, width, channels)
-
-# ground: (samples, numClasses)
-
-# subjects: (samples)
 
 
