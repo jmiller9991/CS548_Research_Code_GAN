@@ -22,7 +22,8 @@ def buildEmotionModel(inputShape, classCnt):
 
     n = inputShape
 
-    model.add(Dense(n / 1.5, activation='sigmoid', input_shape=inputShape))
+    model.add(Flatten(input_shape=inputShape))
+    model.add(Dense(n / 1.5, activation='sigmoid'))
     model.add(Dense(n / 2, activation='sigmoid'))
     model.add(Dropout(10))
     model.add(Dense(n / 4, activation='sigmoid'))
