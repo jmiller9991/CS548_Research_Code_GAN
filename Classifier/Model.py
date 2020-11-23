@@ -1,5 +1,5 @@
-import keras as ks
 import tensorflow as tf
+import keras as ks
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
@@ -62,8 +62,11 @@ def buildConvEmotionModel(inputShape, classCnt):
     return model, epochs, batch_size
 
 def main():
-    inputShape, classCnt, subjects = ck.getLastFrameData()
-    data = imageManip(inputShape)
+    subjects, images, emotionData, facs = ck.getLastFrameData()
+    data = imageManip(images)
 
-    model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data, classCnt)
-    modelImage, epochsImage, batch_size_image = buildConvEmotionModel(inputShape, classCnt)
+    model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data, facs)
+    modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images, facs)
+
+    history_latent = model_latent.fit(data, facs, batch_size=batch_size_latents, epochs=epochs_latents)
+    history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
