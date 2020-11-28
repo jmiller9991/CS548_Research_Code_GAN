@@ -20,7 +20,7 @@ def imageManip(images):
 def buildEmotionModel(inputShape, classCnt):
     model = Sequential()
 
-    n = inputShape
+    n = (512*18)
 
     model.add(Flatten(input_shape=inputShape))
     model.add(Dense(n / 1.5, activation='sigmoid'))
