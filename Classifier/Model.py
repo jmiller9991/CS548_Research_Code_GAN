@@ -1,9 +1,9 @@
 import tensorflow as tf
-import keras as ks
+import tensorflow.keras as ks
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
 import cv2 as cv
 import Data.ck as ck
 import stylegan2.run_projector as proj
