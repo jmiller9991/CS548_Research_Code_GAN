@@ -5,7 +5,9 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 import cv2 as cv
-import Data.ck as ck
+import sys
+sys.path.insert(1, '/CS548_Research_Code_GAN/Data')
+import ck
 import stylegan2.run_projector as proj
 import stylegan2 as sg2
 
