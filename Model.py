@@ -72,6 +72,8 @@ def main():
     history_latent = model_latent.fit(data, facs, batch_size=batch_size_latents, epochs=epochs_latents)
     history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
 
+    print("End")
+
 
 if __name__ == "__main__":
     main()
