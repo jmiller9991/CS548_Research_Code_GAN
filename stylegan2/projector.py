@@ -6,12 +6,14 @@
 
 import numpy as np
 import tensorflow as tf
-import dnnlib
-import dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib
 
-from training import misc
+from stylegan2.training import misc
 
+#
 #----------------------------------------------------------------------------
+#
 
 class Projector:
     def __init__(self):
@@ -23,7 +25,7 @@ class Projector:
         self.lr_rampup_length           = 0.05
         self.noise_ramp_length          = 0.75
         self.regularize_noise_weight    = 1e5
-        self.verbose                    = False
+        self.verbose                    = True
         self.clone_net                  = True
 
         self._Gs                    = None
