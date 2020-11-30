@@ -18,8 +18,6 @@ emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
-
-
 def getEmotionData():
     emotionData = []
     for subject in sorted(os.listdir(emotionsPath)):
@@ -38,12 +36,9 @@ def getEmotionData():
                     emotionData.append(emotionLabel)
     return np.array(emotionData)
 
-
-
-
-
 def getLastFrameFacsDataWithoutIntensity():
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    sumOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     presentActionUnits = []
     facsLabels = []
     for subject in sorted(os.listdir(facsPath)):
@@ -59,7 +54,6 @@ def getLastFrameFacsDataWithoutIntensity():
                         facsFilePaths.append(path)
                     sequenceFacsLabels = np.zeros(shape=30)
                     facsFile = open(facsFilePaths[-1], "r")
-                    index = 0
                     for line in facsFile:
                         for i, sequenceActionUnit in enumerate(line.split()):
                             sequenceActionUnitInt = float(sequenceActionUnit)
@@ -69,13 +63,14 @@ def getLastFrameFacsDataWithoutIntensity():
                                 if i == 0:
                                     if sequenceActionUnitInt == au:
                                         sequenceFacsLabels[j] = 1
+                                        sumOfActionUnits[j] += 1
                                         presentActionUnits.append(au)
                                 j+=1
                         # print(facsFile)
                         # print(sequenceFacsLabels)
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
-    return np.array(facsLabels, dtype=object)
+    return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
 
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))
@@ -91,8 +86,6 @@ def readLandmarks(path):
                     j+=1
             i+=1
     return landmarks
-
-
 
 def getLastFrames():
     subjectSequenceImages = []
@@ -115,17 +108,17 @@ def getLastFrames():
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
             subjectSequenceImages.append(subjectFinalImages)
-    return np.array(subjects), np.array(subjectSequenceImages, dtype=object)
+    return np.array(subjects), np.asarray(subjectSequenceImages)
 
 #todo fix storage of emotion data?
 def getLastFrameData():
     subjects, subjectSequenceImages = getLastFrames()
-    return subjects, subjectSequenceImages, getEmotionData(), getLastFrameFacsDataWithoutIntensity()
+    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
+    return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
 def main():
-    subjects, lastFrameImages, emotionData, facs = getLastFrameData()
-    print(facs)
-
+    subjects, lastFrameImages, emotionData, facs, sumOfActionUnits = getLastFrameData()
+    print(sumOfActionUnits)
 if __name__ == "__main__":
     main()
 
@@ -142,6 +135,8 @@ if __name__ == "__main__":
 # ground: (samples, numClasses)
 
 # subjects: (samples)
+
+# np sum axis 0 that is # aus X # 
 
 
 
