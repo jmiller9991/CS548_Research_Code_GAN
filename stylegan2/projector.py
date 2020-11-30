@@ -11,7 +11,9 @@ import stylegan2.dnnlib.tflib as tflib
 
 from stylegan2.training import misc
 
+#
 #----------------------------------------------------------------------------
+#
 
 class Projector:
     def __init__(self):
