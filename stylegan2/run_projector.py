@@ -6,15 +6,15 @@
 
 import argparse
 import numpy as np
-import dnnlib
-import dnnlib.tflib as tflib
+import stylegan2.dnnlib
+import stylegan2.dnnlib.tflib as tflib
 import re
 import sys
 
-import projector
-import pretrained_networks
-from training import dataset
-from training import misc
+import stylegan2.projector
+import stylegan2.pretrained_networks
+from stylegan2.training import dataset
+from stylegan2.training import misc
 
 #----------------------------------------------------------------------------
 

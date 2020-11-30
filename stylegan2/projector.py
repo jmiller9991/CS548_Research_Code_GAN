@@ -6,10 +6,10 @@
 
 import numpy as np
 import tensorflow as tf
-import dnnlib
-import dnnlib.tflib as tflib
+import stylegan2.dnnlib
+import stylegan2.dnnlib.tflib as tflib
 
-from training import misc
+from stylegan2.training import misc
 
 #----------------------------------------------------------------------------
 
