@@ -154,9 +154,12 @@ class Projector:
         target_images = np.asarray(target_images, dtype='float32')
         target_images = (target_images + 1) * (255 / 2)
         sh = target_images.shape
+        print("sh: ", sh)
+        print("target_images_var: ", self._target_images_var.shape)
         assert sh[0] == self._minibatch_size
         if sh[2] > self._target_images_var.shape[2]:
             factor = sh[2] // self._target_images_var.shape[2]
+            print("factor: ", factor)
             target_images = np.reshape(target_images, [-1, sh[1], sh[2] // factor, factor, sh[3] // factor, factor]).mean((3, 5))
 
         # Initialize optimization state.
