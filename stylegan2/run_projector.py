@@ -11,8 +11,8 @@ import stylegan2.dnnlib.tflib as tflib
 import re
 import sys
 
-import stylegan2.projector
-import stylegan2.pretrained_networks
+from stylegan2 import projector
+from stylegan2 import pretrained_networks
 from stylegan2.training import dataset
 from stylegan2.training import misc
 
