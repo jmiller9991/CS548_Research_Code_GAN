@@ -16,9 +16,7 @@ from stylegan2 import pretrained_networks
 from stylegan2.training import dataset
 from stylegan2.training import misc
 
-#
 #----------------------------------------------------------------------------
-#
 
 def project_image(proj, targets, png_prefix, num_snapshots):
     print('Starting projecting of image.')
