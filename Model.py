@@ -14,8 +14,8 @@ import sys
 #Final output = num of action units size and 0 or 1 as present and not present
 
 def imageManip(images):
-    latents2 = proj.project_image_nosave(sys.argv[1], images)
-    return latents2
+    latents2 = [proj.project_image_nosave(sys.argv[1], [i]) for i in images]
+    return np.asarray(latents2)
 
 
 def buildEmotionModel(inputShape, classCnt):
