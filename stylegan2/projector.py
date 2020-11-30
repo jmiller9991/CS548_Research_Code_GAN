@@ -6,8 +6,8 @@
 
 import numpy as np
 import tensorflow as tf
-import stylegan2.dnnlib
-import stylegan2.dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib
 
 from stylegan2.training import misc
 
