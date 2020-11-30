@@ -170,7 +170,7 @@ def getLastFrameData():
                     lastImage = cv2.imread(imagePaths[-1])
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
-            subjectSequenceImages.append(subjectFinalImages)
+            subjectSequenceImages.extend(subjectFinalImages)
 
     for subject in sorted(os.listdir(emotionsPath)):
         subjectPath = os.path.join(emotionsPath,subject)
