@@ -8,12 +8,13 @@ import cv2 as cv
 import Data.ck as ck
 import stylegan2.run_projector as proj
 import stylegan2 as sg2
+import sys
 
 #Spit out whether an action unit is present or not
 #Final output = num of action units size and 0 or 1 as present and not present
 
 def imageManip(images):
-    latents2 = proj.project_image_nosave(images)
+    latents2 = proj.project_image_nosave(sys.argv[1], images)
     return latents2
 
 
