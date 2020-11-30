@@ -6,8 +6,8 @@
 
 import argparse
 import numpy as np
-import stylegan2.dnnlib
-import stylegan2.dnnlib.tflib as tflib
+from stylegan2 import dnnlib
+from stylegan2.dnnlib import tflib
 import re
 import sys
 
