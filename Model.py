@@ -65,6 +65,7 @@ def buildConvEmotionModel(inputShape, classCnt):
 
 def main():
     subjects, images, emotionData, facs = ck.getLastFrameData()
+    images = images.astype('float32')
     data = imageManip(images)
 
     model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data, facs)
