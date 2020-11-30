@@ -49,6 +49,7 @@ def project_image(proj, targets, png_prefix, num_snapshots):
 def project_image_nosave(network_pkl, targets, proj = projector.Projector()):
     _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
     proj.set_network(Gs)
+    print(targets.shape, targets.dtype)
     proj.start(targets)
     while proj.get_cur_step() < proj.num_steps:
         proj.step()
