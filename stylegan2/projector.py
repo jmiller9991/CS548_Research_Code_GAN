@@ -100,6 +100,8 @@ class Projector:
         # Downsample image to 256x256 if it's larger than that. VGG was built for 224x224 images.
         proc_images_expr = (self._images_expr + 1) * (255 / 2)
         sh = proc_images_expr.shape.as_list()
+        print("Images_Expr: ", self._images_expr)
+        print("proc_imgs_expr: ", proc_images_expr)
         if sh[2] > 256:
             factor = sh[2] // 256
             proc_images_expr = tf.reduce_mean(tf.reshape(proc_images_expr, [-1, sh[1], sh[2] // factor, factor, sh[2] // factor, factor]), axis=[3,5])
