@@ -168,6 +168,8 @@ def getLastFrameData():
                             path = os.path.join(sequencePath, sequenceFile)
                             imagePaths.append(path)
                     lastImage = cv2.imread(imagePaths[-1])
+                    if lastImage.shape != (490, 640, 3):
+                        continue
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
             subjectSequenceImages.extend(subjectFinalImages)
