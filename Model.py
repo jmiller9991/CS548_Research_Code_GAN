@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
-import cv2 as cv
+from cv2 import cv2
 import Data.ck as ck
 import stylegan2.run_projector as proj
 import stylegan2 as sg2
@@ -14,8 +14,21 @@ import sys
 #Final output = num of action units size and 0 or 1 as present and not present
 
 def imageManip(images):
-    latents2 = [proj.project_image_nosave(sys.argv[1], np.expand_dims(i, axis=0)) for i in images]
-    return np.asarray(latents2)
+    latents2 = []
+    for i in images:
+        # Resize to 256x256
+        i = cv2.resize(i, (256, 256))
+        # Go from HxWxC to CxHxW
+        i = i.transpose(2, 0, 1)
+        # Insert a batch size of 1
+        i = np.expand_dims(i, axis=0)
+        # project and append to list of latents
+        latents2.append(proj.project_image_nosave(sys.argv[1], i))
+
+    # latents2 = [proj.project_image_nosave(sys.argv[1], np.expand_dims(i.transpose(2, 0, 1), axis=0)) for i in images]
+    latents_array = np.asarray(latents2)
+    print("Latent Array Shape: ", latents_array.shape)
+    return latents_array
 
 
 def buildEmotionModel(inputShape, classCnt):
