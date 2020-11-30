@@ -189,7 +189,10 @@ def getLastFrameData():
                             emotionLabels.append(emotionLabel)
                     emotionData.append(emotionLabel)
     print(subjectSequenceImages)
-    return np.asarray(subjects), np.asarray(subjectSequenceImages, dtype=np.float32), np.asarray(emotionData), getFacsDataWithoutIntensity()
+    return np.asarray(subjects), \
+           np.asarray(subjectSequenceImages), \
+           np.asarray(emotionData), \
+           getFacsDataWithoutIntensity()
 
 
 def main():
