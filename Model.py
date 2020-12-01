@@ -4,6 +4,8 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
 from cv2 import cv2
 import Data.ck as ck
 import stylegan2.run_projector as proj
@@ -78,6 +80,9 @@ def buildConvEmotionModel(inputShape, classCnt):
     return model, epochs, batch_size
 
 def main():
+    config = ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = InteractiveSession(config=config)
     subjects, images, emotionData, facs = ck.getLastFrameData()
     data = imageManip(images)
     with open("data.pkl", "wb") as f:
