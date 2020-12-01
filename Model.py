@@ -9,6 +9,7 @@ import Data.ck as ck
 import stylegan2.run_projector as proj
 import stylegan2 as sg2
 import sys
+import pickle
 
 #Spit out whether an action unit is present or not
 #Final output = num of action units size and 0 or 1 as present and not present
@@ -79,6 +80,8 @@ def buildConvEmotionModel(inputShape, classCnt):
 def main():
     subjects, images, emotionData, facs = ck.getLastFrameData()
     data = imageManip(images)
+    with open("data.pkl", "wb") as f:
+        pickle.dump(data, f)
 
     model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data, facs)
     modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images, facs)
