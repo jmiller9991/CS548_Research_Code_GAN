@@ -36,7 +36,7 @@ def getEmotionData():
                     emotionData.append(emotionLabel)
     return np.array(emotionData)
 
-def getLastFrameFacsDataWithoutIntensity():
+def getLastFrameFacsDataWithoutIntensity(selectedActionUnits):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     sumOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     presentActionUnits = []
@@ -57,15 +57,16 @@ def getLastFrameFacsDataWithoutIntensity():
                     for line in facsFile:
                         for i, sequenceActionUnit in enumerate(line.split()):
                             sequenceActionUnitInt = float(sequenceActionUnit)
-                            j = 0
-                            for au in allActionUnits:
-                                #skip the intensity
-                                if i == 0:
-                                    if sequenceActionUnitInt == au:
-                                        sequenceFacsLabels[j] = 1
-                                        sumOfActionUnits[j] += 1
-                                        presentActionUnits.append(au)
-                                j+=1
+                            if sequenceActionUnitInt in selectedActionUnits:
+                                j = 0
+                                for au in allActionUnits:
+                                    #skip the intensity
+                                    if i == 0:
+                                        if sequenceActionUnitInt == au:
+                                            sequenceFacsLabels[j] = 1
+                                            sumOfActionUnits[j] += 1
+                                            presentActionUnits.append(au)
+                                    j+=1
                         # print(facsFile)
                         # print(sequenceFacsLabels)
                         allFacsLabels.append(sequenceFacsLabels)
@@ -113,7 +114,7 @@ def getLastFrames():
 #todo fix storage of emotion data?
 def getLastFrameData():
     subjects, subjectSequenceImages = getLastFrames()
-    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
+    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity([1,2,4])
     return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
 def main():
