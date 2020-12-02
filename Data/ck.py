@@ -36,8 +36,12 @@ def getEmotionData():
                     emotionData.append(emotionLabel)
     return np.array(emotionData)
 
-def getLastFrameFacsDataWithoutIntensity(selectedActionUnits):
+#parameter: selectedActionUnits is an optional list of the desired action units to track.
+#if no list is passed in, allActionUnits will be selected
+def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    if not selectedActionUnits:
+        selectedActionUnits = allActionUnits
     sumOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     presentActionUnits = []
     facsLabels = []
@@ -114,7 +118,7 @@ def getLastFrames():
 #todo fix storage of emotion data?
 def getLastFrameData():
     subjects, subjectSequenceImages = getLastFrames()
-    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity([1,2,4])
+    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
     return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
 def main():
