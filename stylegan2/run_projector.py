@@ -57,6 +57,19 @@ def project_image_nosave(network_pkl, targets, proj = projector.Projector()):
 
     return dalatents
 
+def prep_project_image(network_pkl, proj = projector.Projector()):
+    _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
+    proj.set_network(Gs)
+    return proj
+
+def project_target(targets, proj):
+    proj.start(targets)
+    while proj.get_cur_step() < proj.num_steps:
+        proj.step()
+    dalatents = proj.get_dlatents()
+
+    return dalatents
+
 #----------------------------------------------------------------------------
 
 def project_generated_images(network_pkl, seeds, num_snapshots, truncation_psi):

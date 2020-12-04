@@ -2,6 +2,7 @@ import numpy as np
 import os
 import glob
 from cv2 import cv2
+from typing import Tuple
 
 class SequenceData:
     frames = []
@@ -110,8 +111,6 @@ def getFacsDataWithoutIntensity():
                                             sequenceFacsLabels[j] = 1
                                             presentActionUnits.append(au)
                                     j+=1
-                        print(sequenceFile)
-                        print(sequenceFacsLabels)
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
                     # CKData[subject][sequence].facsLabels = allFacsLabels
@@ -149,7 +148,7 @@ def getLandmarksData(CKData):
                     CKData[subject][sequence].landmarks = np.array(CKData[subject][sequence].landmarks)
 
 #todo add action units to this, fix storage of emotion data?
-def getLastFrameData():
+def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjectSequenceImages = []
     subjects = []
     emotionData = []
@@ -168,9 +167,15 @@ def getLastFrameData():
                             path = os.path.join(sequencePath, sequenceFile)
                             imagePaths.append(path)
                     lastImage = cv2.imread(imagePaths[-1])
-                    if lastImage.shape != (490, 640, 3):
-                        continue
-                    print(imagePaths[-1])
+
+                    if make_square:
+                        height, width = lastImage.shape[:2]
+                        trim_size = (width - height) // 2
+                        lastImage = lastImage[:, trim_size:height+trim_size]
+
+                    if(target_shape is not None):
+                        lastImage = cv2.resize(lastImage, target_shape)
+
                     subjectFinalImages.append(lastImage)
             subjectSequenceImages.extend(subjectFinalImages)
 
@@ -190,10 +195,6 @@ def getLastFrameData():
                             #print(emotionLabel)
                             emotionLabels.append(emotionLabel)
                     emotionData.append(emotionLabel)
-    print(subjectSequenceImages[0])
-    for s in subjectSequenceImages:
-        print(s.shape, s.dtype)
-    print(np.asarray(subjectSequenceImages)[0])
     return np.asarray(subjects), \
            np.asarray(subjectSequenceImages), \
            np.asarray(emotionData), \
@@ -201,7 +202,7 @@ def getLastFrameData():
 
 
 def main():
-    subjects, lastFrameImages, emotionData, facs = getLastFrameData()
+    subjects, lastFrameImages, emotionData, facs = getLastFrameData((256, 256), True)
     print(facs)
     #CKData = {}
     #getImageData(CKData)
@@ -217,6 +218,7 @@ if __name__ == "__main__":
 
 #TODO
 # make sure intensity is stored somewhere
+# Crop to square image and resize to 256x256
 
 # pull out separate presesnt AUs into their own array
 
@@ -228,5 +230,6 @@ if __name__ == "__main__":
 # ground: (samples, numClasses)
 
 # subjects: (samples)
+
 
 
