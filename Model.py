@@ -9,6 +9,7 @@ import tensorflow.keras as ks
 
 from cv2 import cv2
 from sklearn.metrics import f1_score
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.models import Sequential
@@ -101,17 +102,19 @@ def main():
     # Flatten the FACs into a 2D array
     facs = facs.reshape((-1, facs.shape[-1]))
 
+    data_train, data_test, facs_train, facs_test = train_test_split(data, facs, test_size=0.2, random_state=1)
+
     # Number of action units
     class_count = facs.shape[-1]
 
     model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data.shape, class_count)
-    modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
+    # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
 
     model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    history_latent = model_latent.fit(data, facs, batch_size=batch_size_latents, epochs=epochs_latents)
+    history_latent = model_latent.fit(data_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, validation_split=0.2)
 
-    modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
+    # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
 
     print("End")
 
