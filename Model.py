@@ -10,6 +10,7 @@ import tensorflow.keras as ks
 from cv2 import cv2
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint, TensorBoard
 from tensorflow.keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
 from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.models import Sequential
@@ -22,10 +23,19 @@ from ImageBackprojector import imageManip
 #Spit out whether an action unit is present or not
 #Final output = num of action units size and 0 or 1 as present and not present
 
-learning_rate = 0.01  # Default: 0.001
+learning_rate = 5.  # Default: 0.001
+def learningRateScheduler(epoch: int) -> float:
+    if (epoch % 10) == 0 and epoch != 0:
+        global learning_rate
+        learning_rate /= 2
+    return learning_rate
+
 optimizer = ks.optimizers.Adam(learning_rate=learning_rate)
 loss = binary_crossentropy
 metrics = ["binary_accuracy"]
+callbacks = [TensorBoard(batch_size=128),
+             LearningRateScheduler(learningRateScheduler, verbose=1),
+             ModelCheckpoint("BestModel.hdf5")]
 
 
 def buildEmotionModel(inputShape, classCnt):
@@ -43,7 +53,7 @@ def buildEmotionModel(inputShape, classCnt):
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 500
+    epochs = 300
     batch_size = 128
 
     return model, epochs, batch_size
@@ -108,7 +118,7 @@ def main():
     # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
 
     model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    history_latent = model_latent.fit(data_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, validation_split=0.2)
+    history_latent = model_latent.fit(data_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
 
     # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
     # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
