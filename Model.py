@@ -25,7 +25,7 @@ from ImageBackprojector import imageManip
 learning_rate = 0.01  # Default: 0.001
 optimizer = ks.optimizers.Adam(learning_rate=learning_rate)
 loss = binary_crossentropy
-metrics = ["accuracy"]
+metrics = ["binary_accuracy"]
 
 
 def buildEmotionModel(inputShape, classCnt):
