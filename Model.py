@@ -10,10 +10,9 @@ import tensorflow.keras as ks
 from cv2 import cv2
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.layers import Conv2D, MaxPooling2D
-from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
+from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.metrics import Accuracy, Recall
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
@@ -25,10 +24,8 @@ from ImageBackprojector import imageManip
 
 learning_rate = 0.01  # Default: 0.001
 optimizer = ks.optimizers.Adam(learning_rate=learning_rate)
-loss = "mse"
-# loss = "huber_loss"
-metrics = [Accuracy()]
-# metrics = [Accuracy(), Recall()]
+loss = binary_crossentropy
+metrics = ["accuracy"]
 
 
 def buildEmotionModel(inputShape, classCnt):
@@ -47,7 +44,7 @@ def buildEmotionModel(inputShape, classCnt):
     model.add(Dense(classCnt, activation='sigmoid'))
 
     epochs = 500
-    batch_size = 16
+    batch_size = 128
 
     return model, epochs, batch_size
 
