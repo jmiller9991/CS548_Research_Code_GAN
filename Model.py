@@ -2,16 +2,17 @@ import argparse
 import numpy as np
 import pickle
 import sys
-
 from typing import List
 
 import tensorflow as tf
 import tensorflow.keras as ks
 
 from cv2 import cv2
+from sklearn.metrics import f1_score
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.metrics import Accuracy, Recall
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
@@ -21,28 +22,31 @@ from ImageBackprojector import imageManip
 #Spit out whether an action unit is present or not
 #Final output = num of action units size and 0 or 1 as present and not present
 
-optimizer = "adam"
+learning_rate = 0.01  # Default: 0.001
+optimizer = ks.optimizers.Adam(learning_rate=learning_rate)
 loss = "mse"
-metrics = ["accuracy", "mape"]
+# loss = "huber_loss"
+metrics = [Accuracy()]
+# metrics = [Accuracy(), Recall()]
 
 
 def buildEmotionModel(inputShape, classCnt):
     model = Sequential()
 
-    n = (512*18)
+    n = 256
 
     model.add(Flatten(input_shape=inputShape[1:]))
-    model.add(Dense(n // 1.5, activation='sigmoid'))
-    model.add(Dense(n // 2, activation='sigmoid'))
+    model.add(Dense(n // 1.5, activation='relu'))
+    model.add(Dense(n // 2, activation='relu'))
     model.add(Dropout(0.10))
-    model.add(Dense(n // 4, activation='sigmoid'))
+    model.add(Dense(n // 4, activation='relu'))
     model.add(Dropout(0.10))
-    model.add(Dense(n // 8, activation='sigmoid'))
+    model.add(Dense(n // 8, activation='relu'))
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 30
-    batch_size = 128
+    epochs = 500
+    batch_size = 16
 
     return model, epochs, batch_size
 
@@ -58,16 +62,16 @@ def buildConvEmotionModel(inputShape, classCnt):
     model.add(Conv2D(2, 3, activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(300, activation='sigmoid'))
-    model.add(Dense(250, activation='sigmoid'))
+    model.add(Dense(300, activation='relu'))
+    model.add(Dense(250, activation='relu'))
     model.add(Dropout(0.10))
-    model.add(Dense(200, activation='sigmoid'))
+    model.add(Dense(200, activation='relu'))
     model.add(Dropout(0.10))
-    model.add(Dense(100, activation='sigmoid'))
+    model.add(Dense(100, activation='relu'))
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 30
+    epochs = 500
     batch_size = 128
 
     return model, epochs, batch_size
@@ -82,6 +86,7 @@ def get_args(argv: List[str]) -> argparse.Namespace:
 def main():
     args = get_args(sys.argv[1:])
 
+    # Enable multi-GPU
     config = ConfigProto()
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
