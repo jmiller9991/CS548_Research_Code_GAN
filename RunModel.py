@@ -121,8 +121,13 @@ def test(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
     # Might as well use an int now
     predictions = predictions.astype(np.uint8)
 
-    f1 = f1_score(facs, predictions, average="weighted")
-    print("F1 Scores:", f1)
+    for fac in range(facs.shape[-1]):
+        print(f"FAC at index {fac}")
+        f1 = f1_score(facs[:, fac], predictions[:, fac])
+        print("F1 Score:", f1)
+
+        con_mat = confusion_matrix(predictions[:, fac], facs[:, fac])
+        print("Confusion Matrix:\n", con_mat)
 
 
 def main():
