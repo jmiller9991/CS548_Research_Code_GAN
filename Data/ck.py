@@ -114,7 +114,7 @@ def getFacsDataWithoutIntensity():
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
                     # CKData[subject][sequence].facsLabels = allFacsLabels
-    return np.array(facsLabels)
+    return np.asarray(facsLabels, dtype=np.uint8)
 
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))

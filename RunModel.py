@@ -2,13 +2,14 @@ import argparse
 import numpy as np
 import pickle
 import sys
+import io
 from typing import List
 
 import tensorflow as tf
 import tensorflow.keras as ks
 
 from cv2 import cv2
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint, TensorBoard
 from tensorflow.keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
@@ -35,7 +36,17 @@ loss = binary_crossentropy
 metrics = ["binary_accuracy"]
 callbacks = [TensorBoard(batch_size=128),
              LearningRateScheduler(learningRateScheduler, verbose=1),
-             ModelCheckpoint("BestModel.hdf5")]
+             ModelCheckpoint("BestModel.hdf5", monitor='val_loss', save_best_only=True)]
+
+
+def get_args(argv: List[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--data", type=argparse.FileType('rb'), required=True, help="Data pkl from ImageBackprojector.py")
+
+    subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
+    test = subparsers.add_parser("test")
+    test.add_argument("-m", "--model", type=str, required=True, help="Saved model from RunModel.py")
+    return parser.parse_args(argv)
 
 
 def buildEmotionModel(inputShape, classCnt):
@@ -59,6 +70,7 @@ def buildEmotionModel(inputShape, classCnt):
     return model, epochs, batch_size
 
 
+"""
 def buildConvEmotionModel(inputShape, classCnt):
     model = Sequential()
 
@@ -83,12 +95,35 @@ def buildConvEmotionModel(inputShape, classCnt):
     batch_size = 128
 
     return model, epochs, batch_size
+"""
 
 
-def get_args(argv: List[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--data", type=argparse.FileType('rb'), required=True, help="Data pkl from ImageBackprojector.py")
-    return parser.parse_args(argv)
+def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
+    latent_space_train, latent_space_test, facs_train, facs_test = train_test_split(latent_space, facs, test_size=0.2, random_state=1)
+
+    # Number of action units
+    class_count = facs.shape[-1]
+
+    model_latent, epochs_latents, batch_size_latents = buildEmotionModel(latent_space.shape, class_count)
+    # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
+
+    model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    history_latent = model_latent.fit(latent_space_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
+
+    # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
+
+
+def test(model_path: str, latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
+    model = ks.models.load_model(model_path)
+
+    predictions = model.predict(latent_space)
+    predictions[predictions >= 0.5] = 1
+    predictions[predictions < 0.5] = 0
+    predictions = predictions.astype(np.uint8)
+
+    f1 = f1_score(facs, predictions, average="weighted")
+    print("F1 Scores:", f1)
 
 
 def main():
@@ -101,27 +136,20 @@ def main():
 
     _, images, _, facs = ck.getLastFrameData((256, 256), True)
 
-    data = pickle.load(args.data)
+    if(facs.dtype != np.uint8):
+        facs = facs.astype(np.uint8)
 
+    data = pickle.load(args.data)
     # Flatten the data to a 2D array
     data = data.reshape((-1, 18 * 512))
 
     # Flatten the FACs into a 2D array
     facs = facs.reshape((-1, facs.shape[-1]))
 
-    data_train, data_test, facs_train, facs_test = train_test_split(data, facs, test_size=0.2, random_state=1)
-
-    # Number of action units
-    class_count = facs.shape[-1]
-
-    model_latent, epochs_latents, batch_size_latents = buildEmotionModel(data.shape, class_count)
-    # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
-
-    model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    history_latent = model_latent.fit(data_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
-
-    # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
+    if args.command == "test":
+        test(args.model, data, images, facs)
+    else:
+        train(data, images, facs)
 
     print("End")
 
