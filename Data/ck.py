@@ -47,23 +47,25 @@ def getImageData(CKData):
                     subjectSequences[sequence] = sequenceData
             CKData[subject] = subjectSequences
 
-def getEmotionData(CKData):
-    for subject in os.listdir(emotionsPath):
+def getEmotionData():
+    emotionData = []
+    for subject in sorted(os.listdir(emotionsPath)):
         subjectPath = os.path.join(emotionsPath,subject)
         if os.path.isdir(subjectPath):
-            for sequence in os.listdir(subjectPath):
+            for sequence in sorted(os.listdir(subjectPath)):
                 sequencePath = os.path.join(subjectPath,sequence)
                 if os.path.isdir(sequencePath):
                     emotionLabels = []
-                    for sequenceFile in os.listdir(sequencePath):
+                    for sequenceFile in sorted(os.listdir(sequencePath)):
                         path = os.path.join(sequencePath, sequenceFile)
                         emotionFile = open(path, "r")
                         emotionLabel = emotionFile.read()
                         if(emotionLabel != ""):
-                            # print(sequencePath)
-                            # print(emotionLabel)
+                            #print(sequencePath)
+                            #print(emotionLabel)
                             emotionLabels.append(emotionLabel)
-                    CKData[subject][sequence].emotionLabel = emotionLabel
+                    emotionData.append(emotionLabel)
+    return np.asarray(emotionData)
 
 def getFacsData(CKData):
     for subject in os.listdir(facsPath):
@@ -114,7 +116,6 @@ def getFacsDataWithoutIntensity():
                         print(sequenceFacsLabels)
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
-                    # CKData[subject][sequence].facsLabels = allFacsLabels
     return np.array(facsLabels)
 
 def readLandmarks(path):
@@ -147,12 +148,9 @@ def getLandmarksData(CKData):
                             landmarks = readLandmarks(path)
                             CKData[subject][sequence].landmarks.append(landmarks)
                     CKData[subject][sequence].landmarks = np.array(CKData[subject][sequence].landmarks)
-
-#todo add action units to this, fix storage of emotion data?
-def getLastFrameData():
-    subjectSequenceImages = []
+        
+def getSubjectsAndPeakEmotionFrame():
     subjects = []
-    emotionData = []
     for subject in sorted(os.listdir(imagesPath)):
         subjectPath = os.path.join(imagesPath,subject)
         subjects.append(subject)
@@ -172,31 +170,18 @@ def getLastFrameData():
                         continue
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
-            subjectSequenceImages.extend(subjectFinalImages)
+            return np.asarray(subjects), np.asarray(subjectFinalImages)
 
-    for subject in sorted(os.listdir(emotionsPath)):
-        subjectPath = os.path.join(emotionsPath,subject)
-        if os.path.isdir(subjectPath):
-            for sequence in sorted(os.listdir(subjectPath)):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    emotionLabels = []
-                    for sequenceFile in sorted(os.listdir(sequencePath)):
-                        path = os.path.join(sequencePath, sequenceFile)
-                        emotionFile = open(path, "r")
-                        emotionLabel = emotionFile.read()
-                        if(emotionLabel != ""):
-                            #print(sequencePath)
-                            #print(emotionLabel)
-                            emotionLabels.append(emotionLabel)
-                    emotionData.append(emotionLabel)
-    print(subjectSequenceImages[0])
-    for s in subjectSequenceImages:
-        print(s.shape, s.dtype)
-    print(np.asarray(subjectSequenceImages)[0])
-    return np.asarray(subjects), \
-           np.asarray(subjectSequenceImages), \
-           np.asarray(emotionData), \
+#todo add action units to this, fix storage of emotion data?
+def getLastFrameData():
+    subjects, peakEmotionImages = getSubjectsAndPeakEmotionFrame()
+    # print(subjectSequenceImages[0])
+    # for s in subjectSequenceImages:
+    #     print(s.shape, s.dtype)
+    # print(np.asarray(subjectSequenceImages)[0])
+    return subjects, \
+           peakEmotionImages, \
+           getEmotionData(), \
            getFacsDataWithoutIntensity()
 
 
