@@ -34,18 +34,16 @@ def learningRateScheduler(epoch: int) -> float:
 optimizer = ks.optimizers.Adam(learning_rate=learning_rate)
 loss = binary_crossentropy
 metrics = ["binary_accuracy"]
+best_model_name = "BestModel.hdf5"
 callbacks = [TensorBoard(batch_size=128),
              LearningRateScheduler(learningRateScheduler, verbose=1),
-             ModelCheckpoint("BestModel.hdf5", monitor='val_loss', save_best_only=True)]
+             ModelCheckpoint(best_model_name, monitor='val_loss', save_best_only=True)]
 
 
 def get_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--data", type=argparse.FileType('rb'), required=True, help="Data pkl from ImageBackprojector.py")
-
-    subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
-    test = subparsers.add_parser("test")
-    test.add_argument("-m", "--model", type=str, required=True, help="Saved model from RunModel.py")
+    parser.add_argument("--train_data", type=argparse.FileType('rb'), required=True, help="Train data pkl from ImageBackprojector.py")
+    parser.add_argument("--test_data", type=argparse.FileType('rb'), required=True, help="Test data pkl from ImageBackprojector.py")
     return parser.parse_args(argv)
 
 
@@ -64,7 +62,7 @@ def buildEmotionModel(inputShape, classCnt):
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 300
+    epochs = 100
     batch_size = 128
 
     return model, epochs, batch_size
@@ -99,8 +97,6 @@ def buildConvEmotionModel(inputShape, classCnt):
 
 
 def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
-    latent_space_train, latent_space_test, facs_train, facs_test = train_test_split(latent_space, facs, test_size=0.2, random_state=1)
-
     # Number of action units
     class_count = facs.shape[-1]
 
@@ -108,18 +104,21 @@ def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
     # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
 
     model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    history_latent = model_latent.fit(latent_space_train, facs_train, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
+    trained_model = model_latent.fit(latent_space, facs, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
 
     # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
     # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
 
 
-def test(model_path: str, latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
-    model = ks.models.load_model(model_path)
+def test(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
+    best_model = ks.models.load_model(best_model_name)
+    predictions = best_model.predict(latent_space)
 
-    predictions = model.predict(latent_space)
+    # Convert to binary values
     predictions[predictions >= 0.5] = 1
     predictions[predictions < 0.5] = 0
+
+    # Might as well use an int now
     predictions = predictions.astype(np.uint8)
 
     f1 = f1_score(facs, predictions, average="weighted")
@@ -136,22 +135,18 @@ def main():
 
     _, images, _, facs = ck.getLastFrameData((256, 256), True)
 
-    if(facs.dtype != np.uint8):
-        facs = facs.astype(np.uint8)
-
-    data = pickle.load(args.data)
+    latent_train, facs_train = pickle.load(args.train_data)
+    latent_test, facs_test = pickle.load(args.test_data)
     # Flatten the data to a 2D array
-    data = data.reshape((-1, 18 * 512))
+    latent_train = latent_train.reshape((-1, 18 * 512))
+    latent_test = latent_test.reshape((-1, 18 * 512))
 
     # Flatten the FACs into a 2D array
-    facs = facs.reshape((-1, facs.shape[-1]))
+    facs_train = facs_train.reshape((-1, facs_train.shape[-1]))
+    facs_test = facs_test.reshape((-1, facs_test.shape[-1]))
 
-    if args.command == "test":
-        test(args.model, data, images, facs)
-    else:
-        train(data, images, facs)
-
-    print("End")
+    train(latent_train, images, facs_train)
+    test(latent_test, images, facs_test)
 
 
 if __name__ == "__main__":

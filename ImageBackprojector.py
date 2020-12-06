@@ -9,6 +9,8 @@ import numpy as np
 if "stylegan2" not in sys.path:
     sys.path.append("stylegan2")
 import stylegan2.run_projector as proj
+
+from sklearn.model_selection import train_test_split
 from cv2 import cv2
 from Data import ck
 
@@ -46,12 +48,18 @@ def get_args(argv: List[str]) -> argparse.Namespace:
 def main():
     args = get_args(sys.argv[1:])
 
-    _, images, _, _ = ck.getLastFrameData((256, 256), True)
-    data = imageManip(args.network, images)
+    _, images, _, facs = ck.getLastFrameData((256, 256), True)
+    latent_space = imageManip(args.network, images)
 
-    data_file = args.data if args.data.endswith(".pkl") else args.data + ".pkl"
-    with open(data_file, "wb") as f:
-        pickle.dump(data, f)
+    data_file = args.data[:-4] if args.data.endswith(".pkl") else args.data
+
+    latent_space_train, latent_space_test, facs_train, facs_test = train_test_split(latent_space, facs, test_size=0.2, random_state=1)
+
+    with open(f"{data_file}-training.pkl", "wb") as f:
+        pickle.dump((latent_space_train, facs_train), f)
+
+    with open(f"{data_file}-test.pkl", "wb") as f:
+        pickle.dump((latent_space_test, facs_test), f)
 
 if __name__ == "__main__":
     main()
