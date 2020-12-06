@@ -18,35 +18,6 @@ emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
-
-#TODO other methods rely on image data to load subjects, pull that out into its own method probably
-def getImageData(CKData):
-    for subject in os.listdir(imagesPath):
-        subjectPath = os.path.join(imagesPath,subject)
-        if os.path.isdir(subjectPath):
-            subjectSequences = {}
-            for sequence in os.listdir(subjectPath):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    # print(sequencePath)
-                    imagePaths = []
-                    for sequenceFile in os.listdir(sequencePath):
-                        if sequenceFile.endswith('.png'):
-                            path = os.path.join(sequencePath, sequenceFile)
-                            imagePaths.append(path)
-                    imagePaths.sort()
-                    images = []
-                    for path in imagePaths:
-                        image = cv2.imread(path)
-                        height, width, channels = image.shape
-                        images.append(image)
-                    sequenceFrames = np.stack(images)
-                    #print(sequenceImages.shape)
-                    sequenceData = SequenceData()
-                    sequenceData.frames = sequenceFrames
-                    subjectSequences[sequence] = sequenceData
-            CKData[subject] = subjectSequences
-
 def getEmotionData():
     emotionData = []
     for subject in sorted(os.listdir(emotionsPath)):
@@ -67,23 +38,7 @@ def getEmotionData():
                     emotionData.append(emotionLabel)
     return np.asarray(emotionData)
 
-def getFacsData(CKData):
-    for subject in os.listdir(facsPath):
-        subjectPath = os.path.join(facsPath,subject)
-        if os.path.isdir(subjectPath):
-            for sequence in os.listdir(subjectPath):
-                sequencePath = os.path.join(subjectPath,sequence)
-                if os.path.isdir(sequencePath):
-                    facsLabels = []
-                    for sequenceFile in os.listdir(sequencePath):
-                        path = os.path.join(sequencePath, sequenceFile)
-                        facsFile = open(path, "r")
-                        facsLabel = facsFile.readlines()
-                        if(facsLabel != ""):
-                            # print(sequencePath)
-                            # print(facsLabel)
-                            facsLabels.append(facsLabel)
-                    CKData[subject][sequence].facsLabels = facsLabels
+
 
 def getFacsDataWithoutIntensity():
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
@@ -170,9 +125,9 @@ def getSubjectsAndPeakEmotionFrame():
                         continue
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
-            return np.asarray(subjects), np.asarray(subjectFinalImages)
+    return np.asarray(subjects), np.asarray(subjectFinalImages)
 
-#todo add action units to this, fix storage of emotion data?
+#todo fix storage of emotion data?
 def getLastFrameData():
     subjects, peakEmotionImages = getSubjectsAndPeakEmotionFrame()
     # print(subjectSequenceImages[0])
@@ -187,14 +142,7 @@ def getLastFrameData():
 
 def main():
     subjects, lastFrameImages, emotionData, facs = getLastFrameData()
-    print(facs)
-    #CKData = {}
-    #getImageData(CKData)
-    #getEmotionData(CKData)
-    #getFacsDataWithoutIntensity(CKData)
-    #getLandmarksData(CKData)
-
-    #print(CKData["S005"]["001"].landmarks[0][0])
+    print(subjects)
 
 if __name__ == "__main__":
     main()
@@ -214,4 +162,50 @@ if __name__ == "__main__":
 
 # subjects: (samples)
 
+#unused
 
+def getImageData(CKData):
+    for subject in os.listdir(imagesPath):
+        subjectPath = os.path.join(imagesPath,subject)
+        if os.path.isdir(subjectPath):
+            subjectSequences = {}
+            for sequence in os.listdir(subjectPath):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    # print(sequencePath)
+                    imagePaths = []
+                    for sequenceFile in os.listdir(sequencePath):
+                        if sequenceFile.endswith('.png'):
+                            path = os.path.join(sequencePath, sequenceFile)
+                            imagePaths.append(path)
+                    imagePaths.sort()
+                    images = []
+                    for path in imagePaths:
+                        image = cv2.imread(path)
+                        height, width, channels = image.shape
+                        images.append(image)
+                    sequenceFrames = np.stack(images)
+                    #print(sequenceImages.shape)
+                    sequenceData = SequenceData()
+                    sequenceData.frames = sequenceFrames
+                    subjectSequences[sequence] = sequenceData
+            CKData[subject] = subjectSequences
+
+
+def getFacsData(CKData):
+    for subject in os.listdir(facsPath):
+        subjectPath = os.path.join(facsPath,subject)
+        if os.path.isdir(subjectPath):
+            for sequence in os.listdir(subjectPath):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    facsLabels = []
+                    for sequenceFile in os.listdir(sequencePath):
+                        path = os.path.join(sequencePath, sequenceFile)
+                        facsFile = open(path, "r")
+                        facsLabel = facsFile.readlines()
+                        if(facsLabel != ""):
+                            # print(sequencePath)
+                            # print(facsLabel)
+                            facsLabels.append(facsLabel)
+                    CKData[subject][sequence].facsLabels = facsLabels
