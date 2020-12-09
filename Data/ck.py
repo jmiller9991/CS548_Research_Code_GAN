@@ -77,6 +77,17 @@ def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
                     facsLabels.append(allFacsLabels)
     return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
 
+def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
+    allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    totalNumberofSequences = 593
+    viableActionUnits = []
+    for i,auSum in enumerate(sumOfActionUnits):
+        pctPositive = auSum/totalNumberofSequences
+        print(pctPositive)
+        if  pctPositive >= minimumFrequency:
+            viableActionUnits.append(allActionUnits[i])
+    return np.asarray(viableActionUnits)
+
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))
     with open(path, "r") as landmarksFile:
@@ -123,7 +134,8 @@ def getLastFrameData():
 
 def main():
     subjects, lastFrameImages, emotionData, facs, sumOfActionUnits = getLastFrameData()
-    print(sumOfActionUnits)
+    viableAUs = get_aus_with_n_pct_positive(sumOfActionUnits, 0.0)
+
 if __name__ == "__main__":
     main()
 
