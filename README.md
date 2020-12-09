@@ -1,7 +1,7 @@
 # Generating Facial Recognition Data usingStyleGAN2
 
-__**Overview**__
+***Overview***
 
-__**Dependencies and Setup**__
+***Dependencies and Setup***
 
-__**Running the project**__
+***Running the project***
