@@ -24,9 +24,9 @@ from ImageBackprojector import imageManip
 #Spit out whether an action unit is present or not
 #Final output = num of action units size and 0 or 1 as present and not present
 
-learning_rate = 5.  # Default: 0.001
+learning_rate = 0.001
 def learningRateScheduler(epoch: int) -> float:
-    if (epoch % 10) == 0 and epoch != 0:
+    if (epoch % 100) == 0 and epoch != 0:
         global learning_rate
         learning_rate /= 2
     return learning_rate
@@ -50,8 +50,9 @@ def get_args(argv: List[str]) -> argparse.Namespace:
 def buildEmotionModel(inputShape, classCnt):
     model = Sequential()
 
-    n = 256
+    n = 4096  # Originally 256
 
+    print(inputShape[1:])
     model.add(Flatten(input_shape=inputShape[1:]))
     model.add(Dense(n // 1.5, activation='relu'))
     model.add(Dense(n // 2, activation='relu'))
@@ -62,7 +63,7 @@ def buildEmotionModel(inputShape, classCnt):
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 100
+    epochs = 1000
     batch_size = 128
 
     return model, epochs, batch_size
@@ -113,6 +114,20 @@ def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
 def test(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
     best_model = ks.models.load_model(best_model_name)
     predictions = best_model.predict(latent_space)
+    np.set_printoptions(threshold=np.inf)
+    print("PREDICTIONS")
+    print()
+    print()
+    print()
+    print()
+    print()
+    print(predictions)
+    print()
+    print()
+    print()
+    print()
+    print()
+    print()
 
     # Convert to binary values
     predictions[predictions >= 0.5] = 1

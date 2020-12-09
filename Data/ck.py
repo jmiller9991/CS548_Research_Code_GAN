@@ -19,7 +19,6 @@ emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
-#todo fix storage of emotion data?
 def getEmotionData():
     emotionData = []
     for subject in sorted(os.listdir(emotionsPath)):
@@ -34,44 +33,78 @@ def getEmotionData():
                         emotionFile = open(path, "r")
                         emotionLabel = emotionFile.read()
                         if(emotionLabel != ""):
-                            #print(sequencePath)
-                            #print(emotionLabel)
                             emotionLabels.append(emotionLabel)
                     emotionData.append(emotionLabel)
     return np.asarray(emotionData)
 
-def getFacsDataWithoutIntensity():
+
+#parameter: selectedActionUnits is an optional list of the desired action units to track.
+#if no list is passed in, allActionUnits will be selected
+def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    if not selectedActionUnits:
+        selectedActionUnits = allActionUnits
+    sumOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     presentActionUnits = []
     facsLabels = []
     for subject in sorted(os.listdir(facsPath)):
         subjectPath = os.path.join(facsPath,subject)
         if os.path.isdir(subjectPath):
-            for sequence in os.listdir(subjectPath):
+            for sequence in sorted(os.listdir(subjectPath)):
                 sequencePath = os.path.join(subjectPath,sequence)
                 if os.path.isdir(sequencePath):
                     allFacsLabels = []
-                    for sequenceFile in os.listdir(sequencePath):
-                        sequenceFacsLabels = np.zeros(shape=30)
-                        path = os.path.join(sequencePath, sequenceFile)
-                        facsFile = open(path, "r")
-                        index = 0
-                        for line in facsFile:
-                            for i, sequenceActionUnit in enumerate(line.split()):
-                                sequenceActionUnitInt = float(sequenceActionUnit)
+                    facsFilePaths = []
+                    for facsFile in sorted(os.listdir(sequencePath)):
+                        path = os.path.join(sequencePath, facsFile)
+                        facsFilePaths.append(path)
+                    sequenceFacsLabels = np.zeros(shape=30)
+                    facsFile = open(facsFilePaths[-1], "r")
+                    for line in facsFile:
+                        for i, sequenceActionUnit in enumerate(line.split()):
+                            sequenceActionUnitInt = float(sequenceActionUnit)
+                            if sequenceActionUnitInt in selectedActionUnits:
                                 j = 0
                                 for au in allActionUnits:
                                     #skip the intensity
                                     if i == 0:
                                         if sequenceActionUnitInt == au:
                                             sequenceFacsLabels[j] = 1
+                                            sumOfActionUnits[j] += 1
                                             presentActionUnits.append(au)
                                     j+=1
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
-    return np.asarray(facsLabels, dtype=np.uint8)
+    return np.asarray(facsLabels, dtype=np.uint8), np.asarray(sumOfActionUnits)
 
-def getSubjectsAndPeakEmotionFrame(target_shape: Tuple[int, int], make_square: bool):
+def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
+    allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
+    totalNumberofSequences = 593
+    viableActionUnits = []
+    for i,auSum in enumerate(sumOfActionUnits):
+        pctPositive = auSum/totalNumberofSequences
+        print(pctPositive)
+        if  pctPositive >= minimumFrequency:
+            viableActionUnits.append(allActionUnits[i])
+    return np.asarray(viableActionUnits)
+
+def readLandmarks(path):
+    landmarks = np.zeros(shape=(68,2))
+    with open(path, "r") as landmarksFile:
+        i = 0
+        for line in landmarksFile:
+            j = 0
+            for point in line.split():
+                if(point != ""):
+                    #print(path)
+                    #print(point)
+                    landmarks[i][j] = point
+                    j+=1
+            i+=1
+    return landmarks
+
+def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
+    subjectSequenceImages = []
     subjects = []
     for subject in sorted(os.listdir(imagesPath)):
         subjectPath = os.path.join(imagesPath,subject)
@@ -97,21 +130,20 @@ def getSubjectsAndPeakEmotionFrame(target_shape: Tuple[int, int], make_square: b
                     if(target_shape is not None):
                         lastImage = cv2.resize(lastImage, target_shape)
 
+                    print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
-    return np.asarray(subjects), np.asarray(subjectFinalImages)
+            subjectSequenceImages.append(subjectFinalImages)
+    return np.asarray(subjects), np.asarray(subjectSequenceImages)
 
-def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
-    subjects, peakEmotionImages = getSubjectsAndPeakEmotionFrame(target_shape, make_square)
-    return subjects, \
-           peakEmotionImages, \
-           getEmotionData(), \
-           getFacsDataWithoutIntensity()
-
+#TODO fix storage of emotion data?
+def getLastFrameData():
+    subjects, subjectSequenceImages = getLastFrames()
+    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
+    return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
 def main():
-    subjects, lastFrameImages, emotionData, facs = getLastFrameData((256, 256), True)
-    print(subjects)
+    subjects, lastFrameImages, emotionData, facs, sumOfActionUnits = getLastFrameData((256, 256), True)
+    viableAUs = get_aus_with_n_pct_positive(sumOfActionUnits, 0.0)
 
 if __name__ == "__main__":
     main()
-
