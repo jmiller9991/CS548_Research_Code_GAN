@@ -136,8 +136,8 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
     return np.asarray(subjects), np.asarray(subjectSequenceImages)
 
 #TODO fix storage of emotion data?
-def getLastFrameData():
-    subjects, subjectSequenceImages = getLastFrames()
+def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
+    subjects, subjectSequenceImages = getLastFrames((256, 256), True)
     facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
     return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
