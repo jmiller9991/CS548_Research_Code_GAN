@@ -75,7 +75,7 @@ def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
                                     j+=1
                         allFacsLabels.append(sequenceFacsLabels)
                     facsLabels.append(allFacsLabels)
-    return np.asarray(facsLabels, dtype=np.uint8), np.asarray(sumOfActionUnits)
+    return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
 
 def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
@@ -83,10 +83,9 @@ def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     viableActionUnits = []
     for i,auSum in enumerate(sumOfActionUnits):
         pctPositive = auSum/totalNumberofSequences
-        print(pctPositive)
         if  pctPositive >= minimumFrequency:
             viableActionUnits.append(allActionUnits[i])
-    return np.asarray(viableActionUnits)
+    return np.asarray(viableActionUnits), np.searchsorted(allActionUnits, viableActionUnits)
 
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))

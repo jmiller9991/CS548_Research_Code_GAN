@@ -25,8 +25,8 @@ from ImageBackprojector import imageManip
 #Final output = num of action units size and 0 or 1 as present and not present
 
 learning_rate = 0.001
-def learningRateScheduler(epoch: int) -> float:
-    if (epoch % 100) == 0 and epoch != 0:
+def learningRateScheduler(epoch: int, interval: int = 10) -> float:
+    if (epoch % interval) == 0 and epoch != 0:
         global learning_rate
         learning_rate /= 2
     return learning_rate
@@ -36,14 +36,17 @@ loss = binary_crossentropy
 metrics = ["binary_accuracy"]
 best_model_name = "BestModel.hdf5"
 callbacks = [TensorBoard(batch_size=128),
-             LearningRateScheduler(learningRateScheduler, verbose=1),
              ModelCheckpoint(best_model_name, monitor='val_loss', save_best_only=True)]
-
 
 def get_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_data", type=argparse.FileType('rb'), required=True, help="Train data pkl from ImageBackprojector.py")
     parser.add_argument("--test_data", type=argparse.FileType('rb'), required=True, help="Test data pkl from ImageBackprojector.py")
+    parser.add_argument("-p", "--percent_active", type=float, default=0, help="Minimum percentage of activation of AUs as a decimal")
+    parser.add_argument("-e", "--epochs", type=int, default=100, help="Epochs to train for")
+    parser.add_argument("-b", "--batch_size", type=int, default=128, help="Batch size for training")
+    parser.add_argument("-l", "--lr_interval", type=int, default=10, help="Number of epochs between learning rate halving")
+    parser.add_argument("-t", "--test", action="store_true", default=False, help="Test the model after training has completed")
     return parser.parse_args(argv)
 
 
@@ -63,71 +66,22 @@ def buildEmotionModel(inputShape, classCnt):
     model.add(Dropout(0.10))
     model.add(Dense(classCnt, activation='sigmoid'))
 
-    epochs = 1000
-    batch_size = 128
-
-    return model, epochs, batch_size
+    return model
 
 
-"""
-def buildConvEmotionModel(inputShape, classCnt):
-    model = Sequential()
-
-    model.add(Conv2D(10, 6, activation='relu', input_shape=inputShape[1:]))
-    model.add(Conv2D(5, 6, activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(3, 3, activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(2, 3, activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Flatten())
-    model.add(Dense(300, activation='relu'))
-    model.add(Dense(250, activation='relu'))
-    model.add(Dropout(0.10))
-    model.add(Dense(200, activation='relu'))
-    model.add(Dropout(0.10))
-    model.add(Dense(100, activation='relu'))
-    model.add(Dropout(0.10))
-    model.add(Dense(classCnt, activation='sigmoid'))
-
-    epochs = 500
-    batch_size = 128
-
-    return model, epochs, batch_size
-"""
-
-
-def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
+def train(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray, epochs: int, batch_size: int, lr_interval: int):
     # Number of action units
     class_count = facs.shape[-1]
 
-    model_latent, epochs_latents, batch_size_latents = buildEmotionModel(latent_space.shape, class_count)
-    # modelImage, epochsImage, batch_size_image = buildConvEmotionModel(images.shape, class_count)
+    model_latent = buildEmotionModel(latent_space.shape, class_count)
 
     model_latent.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    trained_model = model_latent.fit(latent_space, facs, batch_size=batch_size_latents, epochs=epochs_latents, callbacks=callbacks, validation_split=0.2)
-
-    # modelImage.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    # history_image = modelImage.fit(images, facs, batch_size=batch_size_image, epochs=epochsImage)
+    return model_latent.fit(latent_space, facs, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.2)
 
 
 def test(latent_space: np.ndarray, images: np.ndarray, facs: np.ndarray):
     best_model = ks.models.load_model(best_model_name)
     predictions = best_model.predict(latent_space)
-    np.set_printoptions(threshold=np.inf)
-    print("PREDICTIONS")
-    print()
-    print()
-    print()
-    print()
-    print()
-    print(predictions)
-    print()
-    print()
-    print()
-    print()
-    print()
-    print()
 
     # Convert to binary values
     predictions[predictions >= 0.5] = 1
@@ -153,20 +107,36 @@ def main():
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
 
-    _, images, _, facs = ck.getLastFrameData((256, 256), True)
+    _, images, _, facs, au_sum = ck.getLastFrameData((256, 256), True)
+    _, indices_of_interest = ck.get_aus_with_n_pct_positive(au_sum, args.percent_active)
 
+    # Load the data
     latent_train, facs_train = pickle.load(args.train_data)
     latent_test, facs_test = pickle.load(args.test_data)
+
     # Flatten the data to a 2D array
     latent_train = latent_train.reshape((-1, 18 * 512))
     latent_test = latent_test.reshape((-1, 18 * 512))
+
+    # Only keep the AUs that meet the % active requirement
+    facs_train = facs_train[:, :, indices_of_interest]
+    facs_test = facs_test[:, :, indices_of_interest]
 
     # Flatten the FACs into a 2D array
     facs_train = facs_train.reshape((-1, facs_train.shape[-1]))
     facs_test = facs_test.reshape((-1, facs_test.shape[-1]))
 
-    train(latent_train, images, facs_train)
-    test(latent_test, images, facs_test)
+    # Add the learning rate scheduler
+    global callbacks
+    callbacks.append(LearningRateScheduler(lambda epoch:
+                                           learningRateScheduler(epoch,
+                                                                 interval=args.lr_interval),
+                                           verbose=1))
+
+    train(latent_train, images, facs_train, args.epochs, args.batch_size, args.lr_interval)
+
+    if(args.test):
+        test(latent_test, images, facs_test)
 
 
 if __name__ == "__main__":
