@@ -8,6 +8,7 @@ This is the code repository for the paper â€œGenerating Facial Recognition Dataâ
 *Data Loading*
 
 *Back-Projection*
+
 Back-projection is handled by the StyleGAN2 system. This system uses a projector to produce the latent space. In the case of running the projector directly, it will load a generator to aid in obtaining the latent space. Then the projector will produce the latent space for an image but, as it works, it produces a latent space every 100 steps. For the projection built in to training the classifier, it does not save those intermediate steps. 
 
 *Classifier*
