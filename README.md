@@ -21,8 +21,19 @@ Back-projection is handled by the StyleGAN2 system. This system uses a projector
 
 *Data Loading*
 
-
 *Back-Projection*
+
+In order to use the projector, it can be run in two ways. The first way is through the command line. If you want to project images that have been generated, use the command:
+```python run_projector.py project-generated-images --network=gdrive:<network-file> \
+  --seeds=0,1,5
+```
+and if you want to project images that are real, use the command:
+```python run_projector.py project-real-images --network=gdrive:<network-file> \
+  --dataset=<type> --data-dir=~/datasets
+```
+In both cases, <network-file> is the file that the network is saved to as a pkl file and the <type> value is the type of pictures like car for cars and ffhq for faces. For more information, please see the StyleGAN2 documentation at the StyleGAN2 repository.
+
+In addition, you can run the training of the classifier in which back-projection will occur and a file will be saved of the set of images used for training.
 
 *Classifier*
 
