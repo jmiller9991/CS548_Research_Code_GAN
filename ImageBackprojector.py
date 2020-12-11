@@ -32,6 +32,8 @@ def imageManip(network, images, run_pct: float = 1.):
         # project and append to list of latents
         latents_array[i] = proj.project_target(image, projector)[0]
 
+        print(latents_array[i])
+
         print(f"{(i+1)/len(images) * 100:03.2f}% Complete")
 
     # latents2 = [proj.project_image_nosave(sys.argv[1], np.expand_dims(i.transpose(2, 0, 1), axis=0)) for i in images]
