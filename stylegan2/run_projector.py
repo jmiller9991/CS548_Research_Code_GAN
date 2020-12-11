@@ -6,17 +6,19 @@
 
 import argparse
 import numpy as np
-import dnnlib
-import dnnlib.tflib as tflib
+import stylegan2.dnnlib
+import stylegan2.dnnlib.tflib as tflib
 import re
 import sys
 
-import projector
-import pretrained_networks
-from training import dataset
-from training import misc
+from stylegan2 import projector
+from stylegan2 import pretrained_networks
+from stylegan2.training import dataset
+from stylegan2.training import misc
 
+#
 #----------------------------------------------------------------------------
+#
 
 def project_image(proj, targets, png_prefix, num_snapshots):
     print('Starting projecting of image.')
@@ -42,6 +44,31 @@ def project_image(proj, targets, png_prefix, num_snapshots):
         np.save(png_prefix + "final_dlatent", dalatents)
 
     print('\r%-30s\r' % '', end='', flush=True)
+
+#----------------------------------------------------------------------------
+def project_image_nosave(network_pkl, targets, proj = projector.Projector()):
+    _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
+    proj.set_network(Gs)
+    print(targets.shape, targets.dtype)
+    proj.start(targets)
+    while proj.get_cur_step() < proj.num_steps:
+        proj.step()
+    dalatents = proj.get_dlatents()
+
+    return dalatents
+
+def prep_project_image(network_pkl, proj = projector.Projector()):
+    _G, _D, Gs = pretrained_networks.load_networks(network_pkl)
+    proj.set_network(Gs)
+    return proj
+
+def project_target(targets, proj):
+    proj.start(targets)
+    while proj.get_cur_step() < proj.num_steps:
+        proj.step()
+    dalatents = proj.get_dlatents()
+
+    return dalatents
 
 #----------------------------------------------------------------------------
 

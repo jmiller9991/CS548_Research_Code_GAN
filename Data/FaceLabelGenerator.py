@@ -47,8 +47,9 @@ def main():
         print(f"{i + 1}/{len(images)}")
         face = run_detection(image, args.recognition_model, client)
         faces.append(face)
+    faces.sort(key=lambda d: d["localFacePath"])
     with open(args.output, "w") as f:
-        json.dump(faces, f)
+        json.dump(faces, f, indent=4)
 
 
 if __name__ == "__main__":
