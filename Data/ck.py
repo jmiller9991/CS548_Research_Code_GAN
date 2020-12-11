@@ -37,7 +37,7 @@ def getEmotionData():
 @return Two numpy arrays: one for the facslabels from each sequence and one for 
     the total sum of each action unit when present. 
 """
-def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
+def getFacsDataWithoutIntensity(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     if not selectedActionUnits:
         selectedActionUnits = allActionUnits
