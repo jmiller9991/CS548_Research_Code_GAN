@@ -4,13 +4,15 @@ import glob
 from cv2 import cv2
 from typing import Tuple
 
-
 ckPath = '/mnt/Data/CK+/CK+/'
 imagesPath = ckPath + 'cohn-kanade-images'
 emotionsPath = ckPath + 'Emotion'
 facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
+"""
+@return A numpy array of the emotions from each sequence
+"""
 def getEmotionData():
     emotionData = []
     for subject in sorted(os.listdir(emotionsPath)):
@@ -29,9 +31,12 @@ def getEmotionData():
                     emotionData.append(emotionLabel)
     return np.asarray(emotionData)
 
-
-#parameter: selectedActionUnits is an optional list of the desired action units to track.
-#if no list is passed in, allActionUnits will be selected
+"""
+@selectedActionUnits: An optional list of the desired action units to track. 
+    If no list is passed in, allActionUnits will be selected.
+@return Two numpy arrays: one for the facslabels from each sequence and one for 
+    the total sum of each action unit when present. 
+"""
 def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     if not selectedActionUnits:
@@ -69,6 +74,13 @@ def getLastFrameFacsDataWithoutIntensity(selectedActionUnits = []):
                     facsLabels.append(allFacsLabels)
     return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
 
+"""
+@sumOfActionUnits: A list of the total sum of each action unit when present. 
+@minimumFrequency: A decimal representation of a percentage that represents 
+    the minimum percentage of occurences for an AU to be considered viable.
+@return Two numpy arrays: One for the action units that have been determined 
+    to be viable and one for the indices of said action units 
+"""
 def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     totalNumberofSequences = 593
@@ -79,6 +91,10 @@ def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
             viableActionUnits.append(allActionUnits[i])
     return np.asarray(viableActionUnits), np.searchsorted(allActionUnits, viableActionUnits)
 
+"""
+@path: 
+@returns:
+"""
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))
     with open(path, "r") as landmarksFile:
