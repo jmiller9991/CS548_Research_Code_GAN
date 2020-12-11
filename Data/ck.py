@@ -103,8 +103,6 @@ def readLandmarks(path):
             j = 0
             for point in line.split():
                 if(point != ""):
-                    #print(path)
-                    #print(point)
                     landmarks[i][j] = point
                     j+=1
             i+=1
@@ -121,28 +119,23 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
             for sequence in sorted(os.listdir(subjectPath)):
                 sequencePath = os.path.join(subjectPath,sequence)
                 if os.path.isdir(sequencePath):
-                    # print(sequencePath)
                     imagePaths = []
                     for sequenceFile in sorted(os.listdir(sequencePath)):
                         if sequenceFile.endswith('.png'):
                             path = os.path.join(sequencePath, sequenceFile)
                             imagePaths.append(path)
                     lastImage = cv2.imread(imagePaths[-1])
-
                     if make_square:
                         height, width = lastImage.shape[:2]
                         trim_size = (width - height) // 2
                         lastImage = lastImage[:, trim_size:height+trim_size]
-
                     if(target_shape is not None):
                         lastImage = cv2.resize(lastImage, target_shape)
-
                     print(imagePaths[-1])
                     subjectFinalImages.append(lastImage)
             subjectSequenceImages.append(subjectFinalImages)
     return np.asarray(subjects), np.asarray(subjectSequenceImages)
 
-#TODO fix storage of emotion data?
 def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjects, subjectSequenceImages = getLastFrames((256, 256), True)
     facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
