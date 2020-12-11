@@ -155,7 +155,7 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
 
 def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjects, subjectSequenceImages = getLastFrames((256, 256), True)
-    facs, sumOfActionUnits = getLastFrameFacsDataWithoutIntensity()
+    facs, sumOfActionUnits = getFacsDataWithoutIntensity()
     return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
 
 def main():
