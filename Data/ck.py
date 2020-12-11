@@ -108,6 +108,21 @@ def readLandmarks(path):
             i+=1
     return landmarks
 
+def getLandmarksData():
+    landmarksDict = {}
+    for subject in sorted(os.listdir(landmarksPath)):
+        subjectPath = os.path.join(landmarksPath,subject)
+        if os.path.isdir(subjectPath):
+            for sequence in os.listdir(subjectPath):
+                sequencePath = os.path.join(subjectPath,sequence)
+                if os.path.isdir(sequencePath):
+                    for sequenceFile in sorted(os.listdir(sequencePath)):
+                        if sequenceFile.endswith('.txt'):
+                            path = os.path.join(sequencePath, sequenceFile)
+                            landmarks = readLandmarks(path)
+                            landmarksDict[subject][sequence][sequenceFile] = landmarks
+    return landmarksDict
+
 def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
     subjectSequenceImages = []
     subjects = []
