@@ -70,10 +70,8 @@ def getFacsDataWithoutIntensity(selectedActionUnits = []):
                                             sumOfActionUnits[j] += 1
                                             presentActionUnits.append(au)
                                     j+=1
-                        allFacsLabels.append(sequenceFacsLabels)
-                    facsLabels.append(allFacsLabels)
+                    facsLabels.append(sequenceFacsLabels)
     return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
-
 """
 @sumOfActionUnits: A list of the total sum of each action unit when present. 
 @minimumFrequency: A decimal representation of a percentage that represents 
