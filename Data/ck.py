@@ -4,14 +4,6 @@ import glob
 from cv2 import cv2
 from typing import Tuple
 
-class SequenceData:
-    frames = []
-    emotionLabel = ""
-    facsLabels = ""
-    landmarks = []
-
-    def __init__(self):
-        pass
 
 ckPath = '/mnt/Data/CK+/CK+/'
 imagesPath = ckPath + 'cohn-kanade-images'
