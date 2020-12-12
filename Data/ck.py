@@ -34,15 +34,15 @@ def getEmotionData():
 """
 @selectedActionUnits: An optional list of the desired action units to track. 
     If no list is passed in, allActionUnits will be selected.
-@return Two numpy arrays: one for the facslabels from each sequence and one for 
-    the total sum of each action unit when present. 
+@rtype nested numpy arrays of ints, numpy array of ints, nested numpy array of ints   
+@return The facslabels from each sequence, the total sum of each action unit when present and the intensity of each AU. 
 """
 def getFacsData(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     if not selectedActionUnits:
         selectedActionUnits = allActionUnits
     sumOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    intensityOfActionUnits = {}
+    actionUnitIntensities = []
     facsLabels = []
     for subject in sorted(os.listdir(facsPath)):
         subjectPath = os.path.join(facsPath,subject)
@@ -50,7 +50,7 @@ def getFacsData(selectedActionUnits = []):
             for sequence in sorted(os.listdir(subjectPath)):
                 sequencePath = os.path.join(subjectPath,sequence)
                 if os.path.isdir(sequencePath):
-                    allFacsLabels = []
+                    intensityOfActionUnits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                     facsFilePaths = []
                     for facsFile in sorted(os.listdir(sequencePath)):
                         path = os.path.join(sequencePath, facsFile)
@@ -58,23 +58,26 @@ def getFacsData(selectedActionUnits = []):
                     sequenceFacsLabels = np.zeros(shape=30)
                     facsFile = open(facsFilePaths[-1], "r")
                     for line in facsFile:
-                        for i, sequenceActionUnit in enumerate(line.split()):
+                        indexOfPresentAu = -1
+                        for i, item in enumerate(line.split()):
                             #get the au
                             if i == 0:
-                                sequenceActionUnitInt = float(sequenceActionUnit)
+                                sequenceActionUnitInt = float(item)
                                 if sequenceActionUnitInt in selectedActionUnits:
                                     j = 0
                                     for au in allActionUnits:
                                         if sequenceActionUnitInt == au:
                                             sequenceFacsLabels[j] = 1
                                             sumOfActionUnits[j] += 1
-                                            intensityOfActionUnits[au] = 0
+                                            indexOfPresentAu = j
                                         j+=1
                             #get the intensity
                             if i == 1:
-                                intensityOfActionUnits[au] = 0
+                                if indexOfPresentAu >= 0:
+                                    intensityOfActionUnits[indexOfPresentAu] = item 
                     facsLabels.append(sequenceFacsLabels)
-    return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
+                    actionUnitIntensities.append(intensityOfActionUnits)
+    return np.asarray(facsLabels), np.asarray(sumOfActionUnits), np.asarray(actionUnitIntensities)
 
 """
 @selectedActionUnits: An optional list of the desired action units to track. 
