@@ -4,17 +4,13 @@ import glob
 from cv2 import cv2
 from typing import Tuple
 
-ckPath = '/mnt/Data/CK+/CK+/'
-imagesPath = ckPath + 'cohn-kanade-images'
-emotionsPath = ckPath + 'Emotion'
-facsPath = ckPath + 'FACS'
-landmarksPath = ckPath + 'Landmarks'
-
 """
+@cKPath: A string path to the CK+ Database
 @rtype numpy array of strings
 @return The emotion data from each sequence
 """
-def getEmotionData():
+def getEmotionData(ckPath):
+    emotionsPath = ckPath + 'Emotion'
     emotionData = []
     for subject in sorted(os.listdir(emotionsPath)):
         subjectPath = os.path.join(emotionsPath,subject)
@@ -33,12 +29,14 @@ def getEmotionData():
     return np.asarray(emotionData)
 
 """
+@cKPath: A string path to the CK+ Database
 @selectedActionUnits: An optional list of the desired action units to track. 
     If no list is passed in, allActionUnits will be selected.
 @rtype nested numpy arrays of ints, numpy array of ints, nested numpy array of ints   
 @return The facslabels from each sequence, the total sum of each action unit when present and the intensity of each AU. 
 """
-def getFacsData(selectedActionUnits = []):
+def getFacsData(ckPath,selectedActionUnits = []):
+    facsPath = ckPath + 'FACS'
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     if not selectedActionUnits:
         selectedActionUnits = allActionUnits
@@ -81,12 +79,14 @@ def getFacsData(selectedActionUnits = []):
     return np.asarray(facsLabels), np.asarray(sumOfActionUnits), np.asarray(actionUnitIntensities)
 
 """
+@cKPath: A string path to the CK+ Database
 @selectedActionUnits: An optional list of the desired action units to track. 
     If no list is passed in, allActionUnits will be selected.
 @rtype nested numpy arrays of ints, numpy array of ints  
 @return The facslabels from each sequence and the total sum of each action unit when present. 
 """
-def getFacsDataWithoutIntensity(selectedActionUnits = []):
+def getFacsDataWithoutIntensity(ckPath, selectedActionUnits = []):
+    facsPath = ckPath + 'FACS'
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
     if not selectedActionUnits:
         selectedActionUnits = allActionUnits
@@ -159,10 +159,12 @@ def readLandmarks(path):
     return landmarks
 
 """
+@cKPath: A string path to the CK+ Database
 @rtype nested lists of strings
 @returns A list of all landmark data.
 """
-def getLandmarksData():
+def getLandmarksData(ckPath):
+    landmarksPath = ckPath + 'Landmarks'
     landmarksList = []
     for subject in sorted(os.listdir(landmarksPath)):
         subjectPath = os.path.join(landmarksPath,subject)
@@ -182,12 +184,14 @@ def getLandmarksData():
     return landmarksList
 
 """
+@cKPath: A string path to the CK+ Database
 @target_shape: A Tuple of ints that determines the shape of the image.
 @make_square: A boolean that determines if the image will be square.
 @rtype: numpy array of strings, numpy array of image data
 @returns: Subject names and sequence image data.
 """
-def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
+def getLastFrames(ckPath,target_shape: Tuple[int, int], make_square: bool):
+    imagesPath = ckPath + 'cohn-kanade-images'
     subjectSequenceImages = []
     subjects = []
     for subject in sorted(os.listdir(imagesPath)):
@@ -216,12 +220,13 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
     return np.asarray(subjects), np.asarray(subjectSequenceImages)
 
 """
+@cKPath: A string path to the CK+ Database
 @target_shape: A Tuple of ints that determines the shape of the image.
 @make_square: A boolean that determines if the image will be square.
 @rtype: numpy array of strings, numpy array of images, nested numpy array of ints, nested numpy array of ints, numpy array of ints 
 @returns: Subject names, sequence images, emotions, facs data, and the total sum of each action unit when present. 
 """
-def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
-    subjects, subjectSequenceImages = getLastFrames((256, 256), True)
-    facs, sumOfActionUnits = getFacsDataWithoutIntensity()
-    return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
+def getLastFrameData(ckPath, target_shape: Tuple[int, int], make_square: bool):
+    subjects, subjectSequenceImages = getLastFrames(ckPath, (256, 256), True)
+    facs, sumOfActionUnits = getFacsDataWithoutIntensity(ckPath)
+    return subjects, subjectSequenceImages, getEmotionData(ckPath), facs, sumOfActionUnits
