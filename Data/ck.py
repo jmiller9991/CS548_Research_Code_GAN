@@ -216,10 +216,3 @@ def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjects, subjectSequenceImages = getLastFrames((256, 256), True)
     facs, sumOfActionUnits = getFacsDataWithoutIntensity()
     return subjects, subjectSequenceImages, getEmotionData(), facs, sumOfActionUnits
-
-def main():
-    subjects, lastFrameImages, emotionData, facs, sumOfActionUnits = getLastFrameData((256, 256), True)
-    viableAUs = get_aus_with_n_pct_positive(sumOfActionUnits, 0.0)
-
-if __name__ == "__main__":
-    main()
