@@ -70,6 +70,8 @@ conda env create -f conda_environment.yml
 
 ### Data Loading
 
+The data is loaded up automatically when the classifier is run. The user will have to specify the path for CK+.
+
 ### Back-Projection
 
 The projector can be run two different ways, both of which can be seen below.
