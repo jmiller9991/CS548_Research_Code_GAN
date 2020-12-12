@@ -115,7 +115,8 @@ def getFacsDataWithoutIntensity(selectedActionUnits = []):
                                             sumOfActionUnits[j] += 1
                                             presentActionUnits.append(au)
                                     j+=1
-                    facsLabels.append(sequenceFacsLabels)
+                        allFacsLabels.append(sequenceFacsLabels)
+                    facsLabels.append(allFacsLabels)
     return np.asarray(facsLabels), np.asarray(sumOfActionUnits)
 """
 @sumOfActionUnits: A list of the total sum of each action unit when present. 
