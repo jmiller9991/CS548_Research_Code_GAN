@@ -24,6 +24,8 @@ produces a latent space every 100 steps. For the projection built in to
 training the classifier, it does not save those intermediate steps.
 
 ### Classifier
+The classifier is meant to take in an image of a human face and obtain the action 
+units present in the image. 
 
 ### StyleGAN2-Encoder
 
