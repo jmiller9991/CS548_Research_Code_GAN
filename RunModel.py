@@ -47,6 +47,7 @@ def get_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument("-b", "--batch_size", type=int, default=128, help="Batch size for training")
     parser.add_argument("-l", "--lr_interval", type=int, default=10, help="Number of epochs between learning rate halving")
     parser.add_argument("-t", "--test", action="store_true", default=False, help="Test the model after training has completed")
+    parser.add_argument("-c", "--ck", required=True, help="Path to CK Data")
     return parser.parse_args(argv)
 
 
@@ -107,7 +108,7 @@ def main():
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
 
-    _, images, _, facs, au_sum = ck.getLastFrameData((256, 256), True)
+    _, images, _, facs, au_sum = ck.getLastFrameData(args.ck, (256, 256), True)
     _, indices_of_interest = ck.get_aus_with_n_pct_positive(au_sum, args.percent_active)
 
     # Load the data

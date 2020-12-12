@@ -43,12 +43,13 @@ def get_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--network", required=True, help="StyleGAN2 Network pkl")
     parser.add_argument("-d", "--data", required=True, help="File to dump latent data to")
+    parser.add_argument("-c", "--ck", required=True, help="Path to CK Data")
     return parser.parse_args(argv)
 
 def main():
     args = get_args(sys.argv[1:])
 
-    _, images, _, facs = ck.getLastFrameData((256, 256), True)
+    _, images, _, facs = ck.getLastFrameData(args.ck, (256, 256), True)
     latent_space = imageManip(args.network, images)
 
     data_file = args.data[:-4] if args.data.endswith(".pkl") else args.data
