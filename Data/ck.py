@@ -11,7 +11,8 @@ facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
 """
-@return A numpy array of the string emotion data from each sequence
+@rtype numpy array of strings
+@return The emotion data from each sequence
 """
 def getEmotionData():
     emotionData = []
@@ -82,8 +83,8 @@ def getFacsData(selectedActionUnits = []):
 """
 @selectedActionUnits: An optional list of the desired action units to track. 
     If no list is passed in, allActionUnits will be selected.
-@return Two numpy arrays: one for the facslabels from each sequence and one for 
-    the total sum of each action unit when present. 
+@rtype nested numpy arrays of ints, numpy array of ints  
+@return The facslabels from each sequence and the total sum of each action unit when present. 
 """
 def getFacsDataWithoutIntensity(selectedActionUnits = []):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
@@ -125,8 +126,9 @@ def getFacsDataWithoutIntensity(selectedActionUnits = []):
 @sumOfActionUnits: A list of the total sum of each action unit when present. 
 @minimumFrequency: A decimal representation of a percentage that represents 
     the minimum percentage of occurences for an AU to be considered viable.
-@return Two numpy arrays: One for the action units that have been determined 
-    to be viable and one for the indices of said action units.
+@rtype numpy array of ints, numpy array of ints
+@return The action units that have been determined 
+    to be viable and the indices of said action units.
 """
 def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
@@ -140,6 +142,7 @@ def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
 
 """
 @path: A string path to the landmarks file.
+@rtype: numpy array of strings
 @returns: A numpy array of the landmarks from this file.
 """
 def readLandmarks(path):
@@ -156,6 +159,7 @@ def readLandmarks(path):
     return landmarks
 
 """
+@rtype nested lists of strings
 @returns A list of all landmark data.
 """
 def getLandmarksData():
@@ -180,7 +184,8 @@ def getLandmarksData():
 """
 @target_shape: A Tuple of ints that determines the shape of the image.
 @make_square: A boolean that determines if the image will be square.
-@returns: A numpy array of subject names and a numpy array of the sequence images.
+@rtype: numpy array of strings, numpy array of image data
+@returns: Subject names and sequence image data.
 """
 def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
     subjectSequenceImages = []
@@ -213,7 +218,8 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
 """
 @target_shape: A Tuple of ints that determines the shape of the image.
 @make_square: A boolean that determines if the image will be square.
-@returns: a numpy array of subject names, sequence images, emotions, facs data, and the total sum of each action unit when present. 
+@rtype: numpy array of strings, numpy array of images, nested numpy array of ints, nested numpy array of ints, numpy array of ints 
+@returns: Subject names, sequence images, emotions, facs data, and the total sum of each action unit when present. 
 """
 def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjects, subjectSequenceImages = getLastFrames((256, 256), True)
