@@ -24,8 +24,10 @@ produces a latent space every 100 steps. For the projection built in to
 training the classifier, it does not save those intermediate steps.
 
 ### Classifier
-The classifier is meant to take in an image of a human face and obtain the action 
-units present in the image. 
+The classifier is meant to take in the latent space representing an image of a human 
+face and obtain the action units present in the image. This system is not complete, 
+instead, it takes in the CK+ dataset from the data loader and attempts to train using them. 
+It has a poor training capability and needs more work to become a successful action unit classifier.
 
 ### StyleGAN2-Encoder
 
