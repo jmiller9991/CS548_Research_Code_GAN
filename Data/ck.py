@@ -11,7 +11,7 @@ facsPath = ckPath + 'FACS'
 landmarksPath = ckPath + 'Landmarks'
 
 """
-@return A numpy array of the emotions from each sequence
+@return A numpy array of the string emotion data from each sequence
 """
 def getEmotionData():
     emotionData = []
@@ -123,7 +123,7 @@ def getFacsDataWithoutIntensity(selectedActionUnits = []):
 @minimumFrequency: A decimal representation of a percentage that represents 
     the minimum percentage of occurences for an AU to be considered viable.
 @return Two numpy arrays: One for the action units that have been determined 
-    to be viable and one for the indices of said action units 
+    to be viable and one for the indices of said action units.
 """
 def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     allActionUnits = np.array([1,2,4,5,6,7,9,10,11,12,13,14,15,16,17,18,20,21,23,24,25,26,27,28,29,31,34,38,39,43])
@@ -136,8 +136,8 @@ def get_aus_with_n_pct_positive(sumOfActionUnits,minimumFrequency):
     return np.asarray(viableActionUnits), np.searchsorted(allActionUnits, viableActionUnits)
 
 """
-@path: 
-@returns:
+@path: A string path to the landmarks file.
+@returns: A numpy array of the landmarks from this file.
 """
 def readLandmarks(path):
     landmarks = np.zeros(shape=(68,2))
@@ -152,6 +152,9 @@ def readLandmarks(path):
             i+=1
     return landmarks
 
+"""
+@returns A list of all landmark data.
+"""
 def getLandmarksData():
     landmarksList = []
     for subject in sorted(os.listdir(landmarksPath)):
@@ -171,6 +174,11 @@ def getLandmarksData():
                 landmarksList.append(seqDict)
     return landmarksList
 
+"""
+@target_shape: A Tuple of ints that determines the shape of the image.
+@make_square: A boolean that determines if the image will be square.
+@returns: A numpy array of subject names and a numpy array of the sequence images.
+"""
 def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
     subjectSequenceImages = []
     subjects = []
@@ -199,6 +207,11 @@ def getLastFrames(target_shape: Tuple[int, int], make_square: bool):
             subjectSequenceImages.append(subjectFinalImages)
     return np.asarray(subjects), np.asarray(subjectSequenceImages)
 
+"""
+@target_shape: A Tuple of ints that determines the shape of the image.
+@make_square: A boolean that determines if the image will be square.
+@returns: a numpy array of subject names, sequence images, emotions, facs data, and the total sum of each action unit when present. 
+"""
 def getLastFrameData(target_shape: Tuple[int, int], make_square: bool):
     subjects, subjectSequenceImages = getLastFrames((256, 256), True)
     facs, sumOfActionUnits = getFacsDataWithoutIntensity()
