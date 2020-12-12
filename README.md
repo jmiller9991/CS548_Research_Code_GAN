@@ -29,7 +29,11 @@ produces a latent space every 100 steps. For the projection built in to
 training the classifier, it does not save those intermediate steps.
 
 ### Classifier
-
+The classifier is meant to take in the latent space representing an image of a
+human face and obtain the action units present in the image. This system is not
+complete, instead, it takes in the CK+ dataset from the data loader and
+attempts to train using them.  It has a poor training capability and needs more
+work to become a successful action unit classifier.
 ### StyleGAN2-Encoder
 
 The StyleGAN2-Encoder takes advantage of Microsoft's Cognitive Services facial
@@ -54,6 +58,13 @@ and cuDNN 7.5 is required. This GPU must have at least 8GB of RAM.
 
 We elected to use Anaconda for Python 3 as the base environment, using Python
 3.7 with the Tensorflow 1.15, Jupyter, Keras, and Pillow libraries.
+
+The project dependencies can be installed into a new Anaconda environment named
+SORCERY using the command below.
+
+```sh
+conda env create -f conda_environment.yml
+```
 
 ## Running the project
 
