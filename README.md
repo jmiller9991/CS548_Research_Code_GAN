@@ -14,6 +14,11 @@ projects [StyleGAN2](https://github.com/NVlabs/stylegan2) by Karras et al. and
 
 ### Data Loading
 
+The facial recognition training data is loaded from the CK+ database. 
+CK+ contains 593 emotion sequences from 123 subjects. It contains four pieces of information
+for each emotion sequence: images, facial action coding data, emotion details and landmarks. 
+We have created an API to pull any of this information from the database. 
+
 ### Back-Projection
 
 Back-projection is handled by the StyleGAN2 system. This system uses a
